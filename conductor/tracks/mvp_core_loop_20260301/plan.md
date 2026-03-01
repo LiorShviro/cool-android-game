@@ -1,11 +1,11 @@
 # Implementation Plan: MVP Core Gameplay Loop
 
-## Phase 1: Project Scaffolding & State Management
+## Phase 1: Project Scaffolding & State Management [checkpoint: 9f286b9]
 - [x] Task: Initialize React Native project with TypeScript and install dependencies (Zustand, Reanimated, MMKV). (3b4e537)
 - [x] Task: Set up the global game store using Zustand (Stress Meter, Game State, Active Characters). (e308cdc)
-    - [ ] Define the `GameState` (START, PLAYING, GAME_OVER).
-    - [ ] Create actions to update Stress Meter and spawn/remove characters.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+    - [x] Define the `GameState` (START, PLAYING, GAME_OVER).
+    - [x] Create actions to update Stress Meter and spawn/remove characters.
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) (9f286b9)
 
 ## Phase 2: Core Game Loop & Character Spawning
 - [ ] Task: Implement the `CharacterManager` component to handle spawning logic.
