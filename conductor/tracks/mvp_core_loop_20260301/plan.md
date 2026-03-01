@@ -21,8 +21,8 @@
 - [x] Task: Implement the `SnackSorter` station. (b97dac8)
     - [x] Add Left/Right swipe interaction logic. (b97dac8)
     - [x] Link snack delivery to character need fulfillment. (b97dac8)
-- [ ] Task: Implement the `DogDistraction` station.
-    - [ ] Add rapid tapping logic on a bouncing ball element.
+- [x] Task: Implement the `DogDistraction` station. (caae30f)
+    - [x] Add rapid tapping logic on a bouncing ball element. (caae30f)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Integration & Game Over State
