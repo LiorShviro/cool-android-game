@@ -26,7 +26,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) (1bd274e)
 
 ## Phase 4: Integration & Game Over State
-- [ ] Task: Link the action stations to character needs.
-- [ ] Task: Implement the `GameOver` screen and basic local leaderboard with MMKV.
+- [x] Task: Link the action stations to character needs. (215f09a)
+- [x] Task: Implement the `GameOver` screen and basic local leaderboard with MMKV. (215f09a)
 - [ ] Task: Add haptic feedback for timer warnings and mistakes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
