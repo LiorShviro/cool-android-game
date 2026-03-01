@@ -10,7 +10,7 @@
 ## Phase 2: Core Game Loop & Character Spawning
 - [x] Task: Implement the `CharacterManager` component to handle spawning logic. (515a409)
     - [ ] Define character types (Adult, Kid, Dog) and their specific timer durations.
-    - [x] Create the visual `Character` component with a Reanimated timer bubble. (515a409)
+    - [x] Create the visual `Character` component with a Reanimated timer bubble. (243d321)
 - [x] Implement the `OverallStressMeter` component. (bd333d6)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
