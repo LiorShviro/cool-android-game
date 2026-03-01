@@ -15,9 +15,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) (78d0816)
 
 ## Phase 3: Action Stations Implementation
-- [~] Task: Implement the `WaterPitcher` station.
-    - [ ] Add Touch & Hold interaction logic.
-    - [ ] Add precision release validation and 3s lock on failure.
+- [x] Task: Implement the `WaterPitcher` station. (c013b24)
+    - [x] Add Touch & Hold interaction logic. (c013b24)
+    - [x] Add precision release validation and 3s lock on failure. (c013b24)
 - [ ] Task: Implement the `SnackSorter` station.
     - [ ] Add Left/Right swipe interaction logic.
     - [ ] Link snack delivery to character need fulfillment.
