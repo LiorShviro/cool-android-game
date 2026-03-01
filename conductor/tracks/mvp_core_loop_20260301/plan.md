@@ -7,12 +7,12 @@
     - [x] Create actions to update Stress Meter and spawn/remove characters.
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) (9f286b9)
 
-## Phase 2: Core Game Loop & Character Spawning
+## Phase 2: Core Game Loop & Character Spawning [checkpoint: 78d0816]
 - [x] Task: Implement the `CharacterManager` component to handle spawning logic. (515a409)
-    - [ ] Define character types (Adult, Kid, Dog) and their specific timer durations.
+    - [x] Define character types (Adult, Kid, Dog) and their specific timer durations. (515a409)
     - [x] Create the visual `Character` component with a Reanimated timer bubble. (243d321)
 - [x] Implement the `OverallStressMeter` component. (bd333d6)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) (78d0816)
 
 ## Phase 3: Action Stations Implementation
 - [ ] Task: Implement the `WaterPitcher` station.
