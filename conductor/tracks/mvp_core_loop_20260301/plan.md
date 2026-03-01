@@ -2,7 +2,7 @@
 
 ## Phase 1: Project Scaffolding & State Management
 - [x] Task: Initialize React Native project with TypeScript and install dependencies (Zustand, Reanimated, MMKV). (3b4e537)
-- [ ] Task: Set up the global game store using Zustand (Stress Meter, Game State, Active Characters).
+- [x] Task: Set up the global game store using Zustand (Stress Meter, Game State, Active Characters). (e308cdc)
     - [ ] Define the `GameState` (START, PLAYING, GAME_OVER).
     - [ ] Create actions to update Stress Meter and spawn/remove characters.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
