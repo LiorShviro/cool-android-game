@@ -39,6 +39,7 @@ jest.mock('react-native-reanimated', () => {
     runOnJS: jest.fn((fn) => fn),
     withRepeat: jest.fn((val) => val),
     withSequence: jest.fn((...vals) => vals[0]),
+    withSpring: jest.fn((val) => val),
     useAnimatedReaction: jest.fn(),
     default: {
       View: View,
@@ -46,6 +47,31 @@ jest.mock('react-native-reanimated', () => {
     },
     View: View,
     Text: Text,
+  };
+});
+
+// Mock react-native-gesture-handler
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+
+  const createPanGesture = () => {
+    const gesture = {};
+    gesture.onUpdate = jest.fn(() => gesture);
+    gesture.onEnd = jest.fn(() => gesture);
+    gesture.onChange = jest.fn(() => gesture);
+    gesture.onBegin = jest.fn(() => gesture);
+    gesture.onFinalize = jest.fn(() => gesture);
+    return gesture;
+  };
+
+  return {
+    GestureHandlerRootView: ({ children, style }) =>
+      React.createElement(View, { style }, children),
+    GestureDetector: ({ children }) => children,
+    Gesture: {
+      Pan: jest.fn(() => createPanGesture()),
+    },
   };
 });
 

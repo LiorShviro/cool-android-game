@@ -38,6 +38,7 @@ export const useCharacterManager = () => {
       type: randomType,
       need: randomNeed,
       timer: config.timer,
+      spawnedAt: Date.now(),
     };
 
     addCharacter(newCharacter);
