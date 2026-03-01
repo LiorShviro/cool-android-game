@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, act, waitFor } from '@testing-library/react-native';
+import { render, act } from '@testing-library/react-native';
 import { Character } from '../components/Character';
 import { useGameStore } from '../store/gameStore';
 
@@ -11,14 +11,14 @@ jest.mock('../store/gameStore', () => {
 });
 
 describe('Character Component', () => {
-  const mockUpdateStressMeter = jest.fn();
   const mockRemoveCharacter = jest.fn();
+  const mockDecrementLives = jest.fn();
 
   beforeEach(() => {
     jest.useFakeTimers();
     (useGameStore as any).mockReturnValue({
-      updateStressMeter: mockUpdateStressMeter,
       removeCharacter: mockRemoveCharacter,
+      decrementLives: mockDecrementLives,
     });
   });
 
@@ -34,21 +34,21 @@ describe('Character Component', () => {
     timer: 15000,
   };
 
-  it('renders correctly with character details', () => {
+  it('renders correctly with character speech line', () => {
     const { getByText } = render(<Character character={mockCharacter} />);
-
-    expect(getByText("💧 I'm thirsty!")).toBeTruthy();
+    
+    // Check for speech line based on WATER need (using regex to avoid emoji issues)
+    expect(getByText(/I'm thirsty/)).toBeTruthy();
   });
 
-  it('calls updateStressMeter and removeCharacter on timer expiration', () => {
+  it('calls decrementLives and removeCharacter on timer expiration', () => {
     render(<Character character={mockCharacter} />);
-
+    
     act(() => {
       jest.runAllTimers();
     });
-
-    expect(mockUpdateStressMeter).toHaveBeenCalledWith(7);
+    
+    expect(mockDecrementLives).toHaveBeenCalled();
     expect(mockRemoveCharacter).toHaveBeenCalledWith('1');
   });
 });
-

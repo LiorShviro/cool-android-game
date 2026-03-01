@@ -18,7 +18,7 @@ interface CharacterProps {
 }
 
 export const Character: React.FC<CharacterProps> = ({ character }) => {
-  const { updateStressMeter, removeCharacter } = useGameStore();
+  const { decrementLives, removeCharacter } = useGameStore();
   const progress = useSharedValue(1);
 
   const emoji = useMemo(() => {
@@ -54,7 +54,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 
   const handleTimerExpire = () => {
     hapticService.error();
-    updateStressMeter(7); // Penalty for expiring timer
+    decrementLives();
     removeCharacter(character.id);
   };
 
