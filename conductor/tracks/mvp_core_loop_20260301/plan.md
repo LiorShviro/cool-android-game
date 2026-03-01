@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) (9f286b9)
 
 ## Phase 2: Core Game Loop & Character Spawning
-- [ ] Task: Implement the `CharacterManager` component to handle spawning logic.
+- [x] Task: Implement the `CharacterManager` component to handle spawning logic. (515a409)
     - [ ] Define character types (Adult, Kid, Dog) and their specific timer durations.
     - [ ] Create the visual `Character` component with a Reanimated timer bubble.
 - [ ] Task: Implement the `OverallStressMeter` component.
