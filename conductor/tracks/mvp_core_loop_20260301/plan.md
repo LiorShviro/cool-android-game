@@ -25,8 +25,8 @@
     - [x] Add rapid tapping logic on a bouncing ball element. (caae30f)
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) (1bd274e)
 
-## Phase 4: Integration & Game Over State
+## Phase 4: Integration & Game Over State [checkpoint: 46a2d2f]
 - [x] Task: Link the action stations to character needs. (215f09a)
 - [x] Task: Implement the `GameOver` screen and basic local leaderboard with MMKV. (215f09a)
 - [x] Task: Add haptic feedback for timer warnings and mistakes. (b5c79c7)
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md) (46a2d2f)
