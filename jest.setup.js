@@ -1,20 +1,24 @@
 // Manual mock for Reanimated
 jest.mock('react-native-reanimated', () => {
   const { View, Text } = require('react-native');
+  
+  const handleWithTiming = (toValue, config, callback) => {
+    if (callback) {
+      setTimeout(() => callback(true), 0);
+    }
+    return toValue;
+  };
+
   return {
-    useSharedValue: (val) => ({ value: val }),
-    useAnimatedStyle: (cb) => ({}),
-    withTiming: (toValue, config, callback) => {
-      if (callback) {
-        setTimeout(() => callback(true), 0);
-      }
-      return toValue;
-    },
-    interpolateColor: () => 'green',
+    useSharedValue: jest.fn((val) => ({ value: val })),
+    useAnimatedStyle: jest.fn((cb) => ({})),
+    withTiming: jest.fn(handleWithTiming),
+    cancelAnimation: jest.fn(),
+    interpolateColor: jest.fn(() => 'green'),
     Easing: {
-      linear: (t) => t,
+      linear: jest.fn((t) => t),
     },
-    runOnJS: (fn) => fn,
+    runOnJS: jest.fn((fn) => fn),
     default: {
       View: View,
       Text: Text,
