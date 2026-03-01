@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
+import { hapticService } from '../../services/hapticService';
 
 interface DogDistractionProps {
   onSuccess: () => void;
@@ -29,8 +30,10 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
   }, []);
 
   const handleTap = () => {
+    hapticService.light();
     const nextTaps = taps + 1;
     if (nextTaps >= 4) {
+      hapticService.success();
       onSuccess();
       setTaps(0);
     } else {

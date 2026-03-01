@@ -6,8 +6,8 @@ import Animated, {
   withTiming,
   cancelAnimation,
   Easing,
-  runOnJS,
 } from 'react-native-reanimated';
+import { hapticService } from '../../services/hapticService';
 
 interface WaterPitcherProps {
   onSuccess: () => void;
@@ -21,6 +21,7 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const handlePressIn = () => {
     if (isLocked) return;
     
+    hapticService.light();
     fillProgress.value = 0;
     fillProgress.value = withTiming(
       1.5, // Allow overfilling up to 150%
@@ -38,12 +39,15 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
     cancelAnimation(fillProgress);
 
     if (finalFill >= 0.8 && finalFill <= 1.1) {
+      hapticService.success();
       onSuccess();
       fillProgress.value = withTiming(0, { duration: 500 });
     } else if (finalFill > 1.1) {
+      hapticService.error();
       triggerLock();
     } else {
       // Too early - just reset
+      hapticService.warning();
       fillProgress.value = withTiming(0, { duration: 300 });
     }
   };

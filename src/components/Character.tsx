@@ -7,8 +7,10 @@ import Animated, {
   interpolateColor,
   Easing,
   runOnJS,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
+import { hapticService } from '../services/hapticService';
 
 interface CharacterProps {
   character: CharacterType;
@@ -33,7 +35,17 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     );
   }, []);
 
+  useAnimatedReaction(
+    () => progress.value,
+    (current, previous) => {
+      if (current < 0.2 && previous && previous >= 0.2) {
+        runOnJS(hapticService.warning)();
+      }
+    }
+  );
+
   const handleTimerExpire = () => {
+    hapticService.error();
     updateStressMeter(10); // Penalty for expiring timer
     removeCharacter(character.id);
   };

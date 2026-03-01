@@ -11,25 +11,41 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 
+// Mock Haptic Feedback
+jest.mock('react-native-haptic-feedback', () => {
+  return {
+    trigger: jest.fn(),
+  };
+});
+
 // Manual mock for Reanimated
 jest.mock('react-native-reanimated', () => {
   const { View, Text } = require('react-native');
+  
+  const handleWithTiming = (toValue, config, callback) => {
+    if (callback) {
+      setTimeout(() => callback(true), 0);
+    }
+    return toValue;
+  };
+
   return {
     useSharedValue: jest.fn((val) => ({ value: val })),
     useAnimatedStyle: jest.fn((cb) => ({})),
-    withTiming: jest.fn((toValue, config, callback) => {
-      if (callback) setTimeout(() => callback(true), 0);
-      return toValue;
-    }),
+    withTiming: jest.fn(handleWithTiming),
     cancelAnimation: jest.fn(),
     interpolateColor: jest.fn(() => 'green'),
     Easing: { linear: jest.fn((t) => t), out: (cb) => cb, in: (cb) => cb, quad: (t) => t },
     runOnJS: jest.fn((fn) => fn),
     withRepeat: jest.fn((val) => val),
     withSequence: jest.fn((...vals) => vals[0]),
-    default: { View, Text },
-    View,
-    Text,
+    useAnimatedReaction: jest.fn(),
+    default: {
+      View: View,
+      Text: Text,
+    },
+    View: View,
+    Text: Text,
   };
 });
 

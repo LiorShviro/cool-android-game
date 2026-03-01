@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { View, Text, StyleSheet, PanResponder, Animated } from 'react-native';
+import { hapticService } from '../../services/hapticService';
 
 interface SnackSorterProps {
   onSuccess: (snack: 'BAMBA' | 'BISLI') => void;
@@ -17,10 +18,14 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
       onPanResponderRelease: (e, gestureState) => {
         if (gestureState.dx > 50) {
           // Swipe Right
+          hapticService.success();
           onSuccess('BAMBA');
         } else if (gestureState.dx < -50) {
           // Swipe Left
+          hapticService.success();
           onSuccess('BISLI');
+        } else {
+          hapticService.light();
         }
 
         Animated.spring(pan, {
