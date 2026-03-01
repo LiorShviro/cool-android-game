@@ -15,10 +15,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) (26b4e0c)
 
 ## Phase 3: Pause System & Navigation
-- [ ] Task: Implement a `PauseMenu` overlay component.
-- [ ] Task: Add a Pause button to the gameplay HUD.
-- [ ] Task: Update `Character` timers and `CharacterManager` spawning to respect the `isPaused` state.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Implement a `PauseMenu` overlay component. (6d00ba8)
+- [x] Task: Add a Pause button to the gameplay HUD. (6d00ba8)
+- [x] Task: Update `Character` timers and `CharacterManager` spawning to respect the `isPaused` state. (6d00ba8)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) (137db57)
 
 ## Phase 4: Main Menu Extensions (Tutorial & Leaderboard)
 - [ ] Task: Refactor `App.tsx` navigation to support different menu views (MENU, PLAYING, TUTORIAL, LEADERBOARD, GAME_OVER).
