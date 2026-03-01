@@ -10,6 +10,8 @@ The primary objectives for the player are:
 - **Gesture Mastery:** Developing reflexes and physical rhythm to handle the diverse touch interactions required by the five action stations (Hold, Drag & Drop, Continuous Swipe, Quick Swipes, and Rapid Tapping).
 - **Stress Management:** Keeping the overall "Stress Meter" low by fulfilling the needs of adults, kids, and the dog before their individual timers expire.
 - **Pass the Time:** Providing a fun, distracting, and meaningful way to pass the time while staying in a shelter.
+- **Life-Based Progression:** Manage 3 "Rocket" lives—losing one for every missed character—and strive for high scores before running out.
+- **Dynamic Challenge:** Master the increasing pace as spawn rates and character timers intensify based on your performance.
 - **Endless Survival:** Competing for a spot on the local leaderboard by surviving as long as possible as the pace intensifies.
 
 # Initial Concept
@@ -42,8 +44,9 @@ Each station requires a different touch gesture, forcing the player to constantl
 
 ### 4. Scoring & Progression System
 *   **Points:** Base points for delivery, double points for "Green" speed bonus.
-*   **Combos:** Multipliers (x2, x3) for mistake-free streaks.
-*   **End Game:** Endless survival mode. Progressively faster. Ends at 100% stress.
+*   **Combos:** Visual multipliers (x2, x3) for consecutive mistake-free fulfillments.
+*   **Lives:** 3 Rockets. A rocket is lost when a character timer expires.
+*   **End Game:** Endless survival mode. Progressively faster. Ends when lives reach 0 or 100% stress.
 *   **Leaderboard:** Local Top 10 with ranks (e.g., "Mamad Rookie," "Chief of Home Front").
 
 ### 5. Settings & Accessibility
