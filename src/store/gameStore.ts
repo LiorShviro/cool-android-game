@@ -23,6 +23,7 @@ interface GameStore {
   updateStressMeter: (amount: number) => void;
   addCharacter: (character: Character) => void;
   removeCharacter: (id: string) => void;
+  fulfillNeed: (need: string) => void;
   reset: () => void;
 }
 
@@ -51,6 +52,21 @@ export const useGameStore = create<GameStore>((set) => ({
     set((state) => ({
       activeCharacters: state.activeCharacters.filter((c) => c.id !== id),
     })),
+
+  fulfillNeed: (need: string) =>
+    set((state) => {
+      const charIndex = state.activeCharacters.findIndex((c) => c.need === need);
+      if (charIndex === -1) return state;
+
+      const newCharacters = [...state.activeCharacters];
+      newCharacters.splice(charIndex, 1);
+      
+      // Bonus: reduce stress slightly on success
+      return {
+        activeCharacters: newCharacters,
+        stressMeter: Math.max(0, state.stressMeter - 5),
+      };
+    }),
 
   reset: () => set(initialState),
 }));
