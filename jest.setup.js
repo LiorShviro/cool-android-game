@@ -11,6 +11,31 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 
+// Mock Gesture Handler
+jest.mock('react-native-gesture-handler', () => {
+  return {
+    GestureDetector: ({ children }: any) => children,
+    Gesture: {
+      Pan: () => ({
+        onUpdate: (fn: any) => ({
+          onEnd: (fn2: any) => ({}),
+        }),
+        onStart: (fn: any) => ({
+            onUpdate: (fn2: any) => ({
+                onEnd: (fn3: any) => ({}),
+            }),
+        }),
+      }),
+      Tap: () => ({
+        onEnd: (fn: any) => ({}),
+      }),
+    },
+    GestureHandlerRootView: ({ children }: any) => children,
+    State: {},
+    Directions: {},
+  };
+});
+
 // Mock Haptic Feedback
 jest.mock('react-native-haptic-feedback', () => {
   return {
@@ -41,37 +66,13 @@ jest.mock('react-native-reanimated', () => {
     withSequence: jest.fn((...vals) => vals[0]),
     withSpring: jest.fn((val) => val),
     useAnimatedReaction: jest.fn(),
+    useAnimatedStyle: jest.fn(() => ({})),
     default: {
       View: View,
       Text: Text,
     },
     View: View,
     Text: Text,
-  };
-});
-
-// Mock react-native-gesture-handler
-jest.mock('react-native-gesture-handler', () => {
-  const React = require('react');
-  const { View } = require('react-native');
-
-  const createPanGesture = () => {
-    const gesture = {};
-    gesture.onUpdate = jest.fn(() => gesture);
-    gesture.onEnd = jest.fn(() => gesture);
-    gesture.onChange = jest.fn(() => gesture);
-    gesture.onBegin = jest.fn(() => gesture);
-    gesture.onFinalize = jest.fn(() => gesture);
-    return gesture;
-  };
-
-  return {
-    GestureHandlerRootView: ({ children, style }) =>
-      React.createElement(View, { style }, children),
-    GestureDetector: ({ children }) => children,
-    Gesture: {
-      Pan: jest.fn(() => createPanGesture()),
-    },
   };
 });
 

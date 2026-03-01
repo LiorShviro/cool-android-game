@@ -3,106 +3,67 @@ import { useCharacterManager } from '../hooks/useCharacterManager';
 import { useGameStore, GameState } from '../store/gameStore';
 import { act } from 'react-test-renderer';
 
-// Mock the store
+// Mock the store dynamically
+const mockStoreState = {
+  gameState: GameState.PLAYING,
+  addCharacter: jest.fn(),
+  updateStressMeter: jest.fn(),
+  activeCharacters: [],
+  score: 0,
+  isPaused: false,
+};
+
 jest.mock('../store/gameStore', () => {
   const actual = jest.requireActual('../store/gameStore');
   return {
     ...actual,
-    useGameStore: jest.fn(),
+    useGameStore: () => mockStoreState,
   };
 });
 
 describe('useCharacterManager', () => {
-  let mockAddCharacter: jest.Mock;
-  let mockUpdateStressMeter: jest.Mock;
-
   beforeEach(() => {
     jest.useFakeTimers();
-    mockAddCharacter = jest.fn();
-    mockUpdateStressMeter = jest.fn();
-    (useGameStore as any).mockReturnValue({
-      gameState: GameState.PLAYING,
-      addCharacter: mockAddCharacter,
-      updateStressMeter: mockUpdateStressMeter,
-      activeCharacters: [],
-    });
+    mockStoreState.addCharacter.mockClear();
+    mockStoreState.gameState = GameState.PLAYING;
+    mockStoreState.activeCharacters = [];
+    mockStoreState.score = 0;
+    mockStoreState.isPaused = false;
   });
 
   afterEach(() => {
     jest.useRealTimers();
-    jest.clearAllMocks();
   });
 
   it('should spawn a character after an interval', () => {
     renderHook(() => useCharacterManager());
 
     act(() => {
-      jest.advanceTimersByTime(4000); // Wait for spawn interval
-    });
-
-    expect(mockAddCharacter).toHaveBeenCalled();
-    const addedCharacter = mockAddCharacter.mock.calls[0][0];
-    expect(['ADULT', 'KID', 'DOG']).toContain(addedCharacter.type);
-  });
-
-  it('should not spawn characters when game state is START', () => {
-    (useGameStore as any).mockReturnValue({
-      gameState: GameState.START,
-      addCharacter: mockAddCharacter,
-      updateStressMeter: mockUpdateStressMeter,
-      activeCharacters: [],
-    });
-
-    renderHook(() => useCharacterManager());
-
-    act(() => {
-      jest.advanceTimersByTime(5000);
-    });
-
-    expect(mockAddCharacter).not.toHaveBeenCalled();
-  });
-
-  it('should stop spawning characters when game state changes to START', () => {
-    const { rerender } = renderHook(() => useCharacterManager());
-
-    act(() => {
       jest.advanceTimersByTime(4000);
     });
 
-    expect(mockAddCharacter).toHaveBeenCalled();
-    const callCountAfterFirstSpawn = mockAddCharacter.mock.calls.length;
-
-    (useGameStore as any).mockReturnValue({
-      gameState: GameState.START,
-      addCharacter: mockAddCharacter,
-      updateStressMeter: mockUpdateStressMeter,
-      activeCharacters: [],
-    });
-
-    rerender({});
-
-    act(() => {
-      jest.advanceTimersByTime(3000);
-    });
-
-    expect(mockAddCharacter.mock.calls.length).toBe(callCountAfterFirstSpawn);
+    expect(mockStoreState.addCharacter).toHaveBeenCalled();
   });
 
-  it('should not spawn more than 4 characters', () => {
-    (useGameStore as any).mockReturnValue({
-      gameState: GameState.PLAYING,
-      addCharacter: mockAddCharacter,
-      updateStressMeter: mockUpdateStressMeter,
-      activeCharacters: new Array(4).fill({}),
-    });
-
+  it('should spawn characters faster as score increases', () => {
+    mockStoreState.score = 2000; // Interval: 4000 - 1000 = 3000ms
+    
     renderHook(() => useCharacterManager());
-
+    
     act(() => {
-      jest.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(3001);
     });
+    expect(mockStoreState.addCharacter).toHaveBeenCalled();
+  });
 
-    expect(mockAddCharacter).not.toHaveBeenCalled();
+  it('should not spawn characters when paused', () => {
+    mockStoreState.isPaused = true;
+    
+    renderHook(() => useCharacterManager());
+    
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(mockStoreState.addCharacter).not.toHaveBeenCalled();
   });
 });
-

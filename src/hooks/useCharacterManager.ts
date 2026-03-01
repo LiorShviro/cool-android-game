@@ -3,17 +3,22 @@ import { useGameStore, GameState, CharacterType, Character } from '../store/game
 import { CHARACTER_CONFIG, SPAWN_INTERVAL } from '../constants/gameConstants';
 
 export const useCharacterManager = () => {
-  const { gameState, addCharacter, activeCharacters } = useGameStore();
+  const { gameState, addCharacter, activeCharacters, score, isPaused } = useGameStore();
   const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Difficulty scaling: spawn faster as score increases
+  const currentSpawnInterval = Math.max(
+    1000,
+    SPAWN_INTERVAL - Math.floor(score / 1000) * 500
+  );
+
   useEffect(() => {
-    if (gameState === GameState.PLAYING) {
+    if (gameState === GameState.PLAYING && !isPaused) {
       spawnTimerRef.current = setInterval(() => {
-        // Only spawn if we have less than 4 characters for now
         if (activeCharacters.length < 4) {
           spawnRandomCharacter();
         }
-      }, SPAWN_INTERVAL);
+      }, currentSpawnInterval);
     } else {
       if (spawnTimerRef.current) {
         clearInterval(spawnTimerRef.current);
@@ -25,7 +30,7 @@ export const useCharacterManager = () => {
         clearInterval(spawnTimerRef.current);
       }
     };
-  }, [gameState, activeCharacters.length, addCharacter]);
+  }, [gameState, activeCharacters.length, isPaused, currentSpawnInterval]);
 
   const spawnRandomCharacter = () => {
     const types: CharacterType[] = ['ADULT', 'KID', 'DOG'];
@@ -33,12 +38,15 @@ export const useCharacterManager = () => {
     const config = CHARACTER_CONFIG[randomType];
     const randomNeed = config.needs[Math.floor(Math.random() * config.needs.length)];
 
+    // Difficulty scaling: character timers get shorter
+    const timerReduction = Math.floor(score / 1000) * 1000;
+    const currentTimer = Math.max(3000, config.timer - timerReduction);
+
     const newCharacter: Character = {
       id: Math.random().toString(36).substring(7),
       type: randomType,
       need: randomNeed,
-      timer: config.timer,
-      spawnedAt: Date.now(),
+      timer: currentTimer,
     };
 
     addCharacter(newCharacter);
