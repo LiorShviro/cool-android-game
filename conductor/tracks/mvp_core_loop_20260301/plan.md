@@ -28,5 +28,5 @@
 ## Phase 4: Integration & Game Over State
 - [x] Task: Link the action stations to character needs. (215f09a)
 - [x] Task: Implement the `GameOver` screen and basic local leaderboard with MMKV. (215f09a)
-- [ ] Task: Add haptic feedback for timer warnings and mistakes.
+- [x] Task: Add haptic feedback for timer warnings and mistakes. (b5c79c7)
 - [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
