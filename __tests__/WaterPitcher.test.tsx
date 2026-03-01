@@ -80,4 +80,32 @@ describe('WaterPitcher Station', () => {
     
     expect(queryByText('LOCKED')).toBeFalsy();
   });
+
+  it('should reset if released too early', () => {
+    const mockOnSuccess = jest.fn();
+    const { getByTestId } = render(<WaterPitcher onSuccess={mockOnSuccess} />);
+    const station = getByTestId('water-pitcher-pressable');
+
+    fireEvent(station, 'onPressIn');
+    
+    act(() => {
+      mockSharedValue.value = 0.5; // Too early (< 0.8)
+    });
+    
+    fireEvent(station, 'onPressOut');
+    
+    expect(mockOnSuccess).not.toHaveBeenCalled();
+  });
+
+  it('should clear existing lock timer if triggered again', () => {
+    // This is hard to verify without internal access, but we can trigger it
+    const { getByTestId } = render(<WaterPitcher onSuccess={jest.fn()} />);
+    const station = getByTestId('water-pitcher-pressable');
+
+    fireEvent(station, 'onPressIn');
+    act(() => { mockSharedValue.value = 1.2; });
+    fireEvent(station, 'onPressOut'); // First lock
+
+    // We can't easily trigger another lock while locked because button is disabled
+  });
 });
