@@ -8,6 +8,7 @@ import Animated, {
   Easing,
   runOnJS,
   useAnimatedReaction,
+  cancelAnimation,
 } from 'react-native-reanimated';
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
 import { hapticService } from '../services/hapticService';
@@ -18,30 +19,29 @@ interface CharacterProps {
 }
 
 export const Character: React.FC<CharacterProps> = ({ character }) => {
-  const { decrementLives, removeCharacter } = useGameStore();
+  const { decrementLives, removeCharacter, isPaused } = useGameStore();
   const progress = useSharedValue(1);
-
-  const emoji = useMemo(() => {
-    const options = CHARACTER_EMOJIS[character.type] ?? ['👤'];
-    return options[Math.floor(Math.random() * options.length)];
-  }, [character.type]);
-
-  const speechText = SPEECH_LINES[character.need] ?? character.need;
+  const pausedProgress = useSharedValue(1);
 
   useEffect(() => {
-    progress.value = withTiming(
-      0,
-      {
-        duration: character.timer,
-        easing: Easing.linear,
-      },
-      (finished) => {
-        if (finished) {
-          runOnJS(handleTimerExpire)();
+    if (!isPaused) {
+      progress.value = withTiming(
+        0,
+        {
+          duration: character.timer * pausedProgress.value,
+          easing: Easing.linear,
+        },
+        (finished) => {
+          if (finished) {
+            runOnJS(handleTimerExpire)();
+          }
         }
-      }
-    );
-  }, []);
+      );
+    } else {
+      pausedProgress.value = progress.value;
+      cancelAnimation(progress);
+    }
+  }, [isPaused]);
 
   useAnimatedReaction(
     () => progress.value,
@@ -79,19 +79,20 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     return { borderColor: color };
   });
 
+  const emoji = useMemo(() => {
+    const options = CHARACTER_EMOJIS[character.type] ?? ['👤'];
+    return options[Math.floor(Math.random() * options.length)];
+  }, [character.type]);
+
+  const speechText = SPEECH_LINES[character.need] ?? character.need;
+
   return (
     <View style={styles.container}>
-      {/* Speech bubble */}
       <Animated.View style={[styles.speechBubble, bubbleBorderStyle]}>
         <Text style={styles.speechText}>{speechText}</Text>
       </Animated.View>
-      {/* Bubble tail */}
       <View style={styles.bubbleTail} />
-
-      {/* Emoji avatar */}
       <Text style={styles.avatar}>{emoji}</Text>
-
-      {/* Timer bar */}
       <View style={styles.timerBarTrack}>
         <Animated.View style={[styles.timerBarFill, timerBarStyle]} />
       </View>
