@@ -1,4 +1,4 @@
-import { dependencies } from '../package.json';
+import { dependencies } from '../../package.json';
 
 describe('Project Dependencies', () => {
   it('should have zustand installed', () => {
@@ -17,3 +17,4 @@ describe('Project Dependencies', () => {
     expect(dependencies).toHaveProperty('react-native-haptic-feedback');
   });
 });
+

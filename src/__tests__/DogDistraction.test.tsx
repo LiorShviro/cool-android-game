@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { DogDistraction } from '../src/components/stations/DogDistraction';
+import { DogDistraction } from '../components/stations/DogDistraction';
 
 describe('DogDistraction Station', () => {
   it('renders correctly', () => {
@@ -22,3 +22,4 @@ describe('DogDistraction Station', () => {
     expect(mockOnSuccess).toHaveBeenCalled();
   });
 });
+

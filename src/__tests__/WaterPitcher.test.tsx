@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
-import { WaterPitcher } from '../src/components/stations/WaterPitcher';
+import { WaterPitcher } from '../components/stations/WaterPitcher';
 import { useSharedValue } from 'react-native-reanimated';
 
 // Mock Reanimated
@@ -109,3 +109,4 @@ describe('WaterPitcher Station', () => {
     // We can't easily trigger another lock while locked because button is disabled
   });
 });
+

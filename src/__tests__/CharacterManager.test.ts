@@ -1,11 +1,11 @@
 import { renderHook } from '@testing-library/react-native';
-import { useCharacterManager } from '../src/hooks/useCharacterManager';
-import { useGameStore, GameState } from '../src/store/gameStore';
+import { useCharacterManager } from '../hooks/useCharacterManager';
+import { useGameStore, GameState } from '../store/gameStore';
 import { act } from 'react-test-renderer';
 
 // Mock the store
-jest.mock('../src/store/gameStore', () => {
-  const actual = jest.requireActual('../src/store/gameStore');
+jest.mock('../store/gameStore', () => {
+  const actual = jest.requireActual('../store/gameStore');
   return {
     ...actual,
     useGameStore: jest.fn(),
@@ -105,3 +105,4 @@ describe('useCharacterManager', () => {
     expect(mockAddCharacter).not.toHaveBeenCalled();
   });
 });
+

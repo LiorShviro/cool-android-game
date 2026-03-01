@@ -1,4 +1,4 @@
-import { useGameStore, GameState } from '../src/store/gameStore';
+import { useGameStore, GameState } from '../store/gameStore';
 
 describe('Game Store', () => {
   beforeEach(() => {
@@ -47,3 +47,4 @@ describe('Game Store', () => {
     expect(useGameStore.getState().activeCharacters).toEqual([]);
   });
 });
+

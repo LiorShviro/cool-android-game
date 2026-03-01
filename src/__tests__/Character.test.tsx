@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, act, waitFor } from '@testing-library/react-native';
-import { Character } from '../src/components/Character';
-import { useGameStore } from '../src/store/gameStore';
+import { Character } from '../components/Character';
+import { useGameStore } from '../store/gameStore';
 
 // Mock the store
-jest.mock('../src/store/gameStore', () => {
+jest.mock('../store/gameStore', () => {
   return {
     useGameStore: jest.fn(),
   };
@@ -52,3 +52,4 @@ describe('Character Component', () => {
     expect(mockRemoveCharacter).toHaveBeenCalledWith('1');
   });
 });
+

@@ -1,4 +1,4 @@
-import { hapticService } from '../src/services/hapticService';
+import { hapticService } from '../services/hapticService';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 // Mock the library
@@ -37,3 +37,4 @@ describe('Haptic Service', () => {
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith('notificationError', expect.anything());
   });
 });
+

@@ -1,4 +1,4 @@
-import { storageService } from '../src/services/storageService';
+import { storageService } from '../services/storageService';
 
 // Mock MMKV
 jest.mock('react-native-mmkv', () => {
@@ -37,3 +37,4 @@ describe('Storage Service', () => {
     expect(scores[2].score).toBe(50);
   });
 });
+

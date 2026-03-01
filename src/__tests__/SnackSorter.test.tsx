@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, act } from '@testing-library/react-native';
-import { SnackSorter } from '../src/components/stations/SnackSorter';
+import { SnackSorter } from '../components/stations/SnackSorter';
 
 describe('SnackSorter Station', () => {
   it('renders correctly', () => {
@@ -32,3 +32,4 @@ describe('SnackSorter Station', () => {
     expect(mockOnSuccess).toHaveBeenCalledWith('BISLI');
   });
 });
+
