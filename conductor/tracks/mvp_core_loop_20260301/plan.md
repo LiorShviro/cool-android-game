@@ -14,7 +14,7 @@
 - [x] Implement the `OverallStressMeter` component. (bd333d6)
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) (78d0816)
 
-## Phase 3: Action Stations Implementation
+## Phase 3: Action Stations Implementation [checkpoint: 1bd274e]
 - [x] Task: Implement the `WaterPitcher` station. (c013b24)
     - [x] Add Touch & Hold interaction logic. (c013b24)
     - [x] Add precision release validation and 3s lock on failure. (c013b24)
@@ -23,7 +23,7 @@
     - [x] Link snack delivery to character need fulfillment. (b97dac8)
 - [x] Task: Implement the `DogDistraction` station. (caae30f)
     - [x] Add rapid tapping logic on a bouncing ball element. (caae30f)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) (1bd274e)
 
 ## Phase 4: Integration & Game Over State
 - [ ] Task: Link the action stations to character needs.
