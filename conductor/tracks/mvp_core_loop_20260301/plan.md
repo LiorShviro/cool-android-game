@@ -18,9 +18,9 @@
 - [x] Task: Implement the `WaterPitcher` station. (c013b24)
     - [x] Add Touch & Hold interaction logic. (c013b24)
     - [x] Add precision release validation and 3s lock on failure. (c013b24)
-- [ ] Task: Implement the `SnackSorter` station.
-    - [ ] Add Left/Right swipe interaction logic.
-    - [ ] Link snack delivery to character need fulfillment.
+- [x] Task: Implement the `SnackSorter` station. (b97dac8)
+    - [x] Add Left/Right swipe interaction logic. (b97dac8)
+    - [x] Link snack delivery to character need fulfillment. (b97dac8)
 - [ ] Task: Implement the `DogDistraction` station.
     - [ ] Add rapid tapping logic on a bouncing ball element.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
