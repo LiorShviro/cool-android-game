@@ -9,10 +9,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) (7272578)
 
 ## Phase 2: Difficulty Scaling & Combos
-- [ ] Task: Implement dynamic spawn calculation in `useCharacterManager` based on current score.
-- [ ] Task: Implement combo logic in `gameStore` (success increments, failure resets).
-- [ ] Task: Create a `ComboPopup` animation using Reanimated to show "x2", "x3" when successful.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Implement dynamic spawn calculation in `useCharacterManager` based on current score. (e2f2b85)
+- [x] Task: Implement combo logic in `gameStore` (success increments, failure resets). (e2f2b85)
+- [x] Task: Create a `ComboPopup` animation using Reanimated to show "x2", "x3" when successful. (e2f2b85)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) (26b4e0c)
 
 ## Phase 3: Pause System & Navigation
 - [ ] Task: Implement a `PauseMenu` overlay component.
