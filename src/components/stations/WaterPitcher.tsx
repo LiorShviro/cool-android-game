@@ -38,11 +38,11 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
     const finalFill = fillProgress.value;
     cancelAnimation(fillProgress);
 
-    if (finalFill >= 0.8 && finalFill <= 1.1) {
+    if (finalFill >= 0.65 && finalFill <= 1.2) {
       hapticService.success();
       onSuccess();
       fillProgress.value = withTiming(0, { duration: 500 });
-    } else if (finalFill > 1.1) {
+    } else if (finalFill > 1.2) {
       hapticService.error();
       triggerLock();
     } else {
@@ -59,13 +59,13 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
     lockTimerRef.current = setTimeout(() => {
       setIsLocked(false);
       fillProgress.value = 0;
-    }, 3000);
+    }, 1500);
   };
 
   const animatedWaterStyle = useAnimatedStyle(() => {
     return {
       height: `${Math.min(100, fillProgress.value * 100)}%`,
-      backgroundColor: fillProgress.value > 1.1 ? '#FF4444' : '#33b5e5',
+      backgroundColor: fillProgress.value > 1.2 ? '#FF4444' : '#33b5e5',
     };
   });
 

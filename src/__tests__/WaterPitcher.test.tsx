@@ -60,24 +60,24 @@ describe('WaterPitcher Station', () => {
     expect(mockOnSuccess).toHaveBeenCalled();
   });
 
-  it('should lock for 3 seconds if overfilled', () => {
-    const { getByTestId, queryByText, getByText } = render(<WaterPitcher onSuccess={jest.fn()} />);
+  it('should lock for 1.5 seconds if overfilled', () => {
+    const { getByTestId, queryByText } = render(<WaterPitcher onSuccess={jest.fn()} />);
     const station = getByTestId('water-pitcher-pressable');
 
     fireEvent(station, 'onPressIn');
-    
+
     act(() => {
-      mockSharedValue.value = 1.2; // Overfilled (> 1.1)
+      mockSharedValue.value = 1.3; // Overfilled (> 1.2)
     });
-    
+
     fireEvent(station, 'onPressOut');
-    
+
     expect(queryByText('LOCKED')).toBeTruthy();
-    
+
     act(() => {
-      jest.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(1500);
     });
-    
+
     expect(queryByText('LOCKED')).toBeFalsy();
   });
 
@@ -103,7 +103,7 @@ describe('WaterPitcher Station', () => {
     const station = getByTestId('water-pitcher-pressable');
 
     fireEvent(station, 'onPressIn');
-    act(() => { mockSharedValue.value = 1.2; });
+    act(() => { mockSharedValue.value = 1.3; });
     fireEvent(station, 'onPressOut'); // First lock
 
     // We can't easily trigger another lock while locked because button is disabled

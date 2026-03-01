@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { ChargingStation } from '../src/components/stations/ChargingStation';
+import { ChargingStation } from '../components/stations/ChargingStation';
 
 describe('ChargingStation Station', () => {
   it('renders with CHARGE text', () => {

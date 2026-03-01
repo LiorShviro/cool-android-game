@@ -1,19 +1,34 @@
+export const SPEECH_LINES: Record<string, string> = {
+  WATER: '💧 I\'m thirsty!',
+  CHARGING: '🔋 Phone dying!',
+  RECEPTION: '📶 No signal!',
+  BAMBA: '🥜 Want Bamba!',
+  BISLI: '🌀 Want Bisli!',
+  PET: '🐾 Pet me!',
+};
+
+export const CHARACTER_EMOJIS: Record<string, string[]> = {
+  ADULT: ['👨', '👩'],
+  KID: ['👦', '👧'],
+  DOG: ['🐕'],
+};
+
 export const CHARACTER_CONFIG = {
   ADULT: {
     types: ['ADULT'] as const,
     needs: ['WATER', 'CHARGING', 'RECEPTION'] as const,
-    timer: 15000, // 15s
+    timer: 20000, // 20s
   },
   KID: {
     types: ['KID'] as const,
     needs: ['BAMBA', 'BISLI'] as const,
-    timer: 10000, // 10s
+    timer: 14000, // 14s
   },
   DOG: {
     types: ['DOG'] as const,
     needs: ['PET'] as const,
-    timer: 7000, // 7s
+    timer: 10000, // 10s
   },
 };
 
-export const SPAWN_INTERVAL = 3000; // 3s
+export const SPAWN_INTERVAL = 4000; // 4s

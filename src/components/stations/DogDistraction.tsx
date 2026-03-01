@@ -32,7 +32,7 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
   const handleTap = () => {
     hapticService.light();
     const nextTaps = taps + 1;
-    if (nextTaps >= 4) {
+    if (nextTaps >= 3) {
       hapticService.success();
       onSuccess();
       setTaps(0);
@@ -52,7 +52,7 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
       <View style={styles.court}>
         <Pressable testID="dog-ball" onPress={handleTap}>
           <Animated.View style={[styles.ball, animatedBallStyle]}>
-            <Text style={styles.tapCount}>{taps > 0 ? 4 - taps : ''}</Text>
+            <Text style={styles.tapCount}>{taps > 0 ? 3 - taps : ''}</Text>
           </Animated.View>
         </Pressable>
       </View>

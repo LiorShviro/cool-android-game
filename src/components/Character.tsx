@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
 import { hapticService } from '../services/hapticService';
+import { SPEECH_LINES, CHARACTER_EMOJIS } from '../constants/gameConstants';
 
 interface CharacterProps {
   character: CharacterType;
@@ -19,6 +20,13 @@ interface CharacterProps {
 export const Character: React.FC<CharacterProps> = ({ character }) => {
   const { updateStressMeter, removeCharacter } = useGameStore();
   const progress = useSharedValue(1);
+
+  const emoji = useMemo(() => {
+    const options = CHARACTER_EMOJIS[character.type] ?? ['👤'];
+    return options[Math.floor(Math.random() * options.length)];
+  }, [character.type]);
+
+  const speechText = SPEECH_LINES[character.need] ?? character.need;
 
   useEffect(() => {
     progress.value = withTiming(
@@ -46,33 +54,46 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 
   const handleTimerExpire = () => {
     hapticService.error();
-    updateStressMeter(10); // Penalty for expiring timer
+    updateStressMeter(7); // Penalty for expiring timer
     removeCharacter(character.id);
   };
 
-  const animatedCircleStyle = useAnimatedStyle(() => {
+  const timerBarStyle = useAnimatedStyle(() => {
     const color = interpolateColor(
       progress.value,
       [0, 0.2, 0.5, 1],
-      ['#FF4444', '#FFBB33', '#00C851', '#00C851'] // Red, Yellow, Green
+      ['#FF4444', '#FFBB33', '#00C851', '#00C851']
     );
-
     return {
+      width: `${progress.value * 100}%`,
       backgroundColor: color,
-      transform: [{ scale: progress.value }],
     };
+  });
+
+  const bubbleBorderStyle = useAnimatedStyle(() => {
+    const color = interpolateColor(
+      progress.value,
+      [0, 0.2, 0.5, 1],
+      ['#FF4444', '#FFBB33', '#00C851', '#00C851']
+    );
+    return { borderColor: color };
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.bubbleContainer}>
-        <Animated.View style={[styles.timerBubble, animatedCircleStyle]} />
-        <View style={styles.needContainer}>
-          <Text style={styles.needText}>{character.need}</Text>
-        </View>
-      </View>
-      <View style={styles.characterVisual}>
-        <Text style={styles.characterType}>{character.type}</Text>
+      {/* Speech bubble */}
+      <Animated.View style={[styles.speechBubble, bubbleBorderStyle]}>
+        <Text style={styles.speechText}>{speechText}</Text>
+      </Animated.View>
+      {/* Bubble tail */}
+      <View style={styles.bubbleTail} />
+
+      {/* Emoji avatar */}
+      <Text style={styles.avatar}>{emoji}</Text>
+
+      {/* Timer bar */}
+      <View style={styles.timerBarTrack}>
+        <Animated.View style={[styles.timerBarFill, timerBarStyle]} />
       </View>
     </View>
   );
@@ -81,47 +102,53 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 10,
-    width: 80,
+    margin: 8,
+    width: 90,
   },
-  bubbleContainer: {
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  timerBubble: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 30,
-    opacity: 0.6,
-  },
-  needContainer: {
+  speechBubble: {
     backgroundColor: 'white',
-    padding: 5,
     borderRadius: 10,
-    elevation: 3,
+    borderWidth: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    maxWidth: 90,
+    elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 1,
+    shadowRadius: 2,
   },
-  needText: {
-    fontSize: 10,
+  speechText: {
+    fontSize: 9,
     fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
   },
-  characterVisual: {
+  bubbleTail: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 6,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'white',
+    marginTop: -1,
+  },
+  avatar: {
+    fontSize: 36,
+    marginTop: 2,
+  },
+  timerBarTrack: {
+    width: 60,
+    height: 5,
     backgroundColor: '#E0E0E0',
-    width: 50,
-    height: 70,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginTop: 4,
   },
-  characterType: {
-    fontSize: 12,
-    fontWeight: 'bold',
+  timerBarFill: {
+    height: '100%',
+    borderRadius: 3,
   },
 });

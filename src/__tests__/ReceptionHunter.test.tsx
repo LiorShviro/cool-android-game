@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { ReceptionHunter } from '../src/components/stations/ReceptionHunter';
+import { ReceptionHunter } from '../components/stations/ReceptionHunter';
 
 describe('ReceptionHunter Station', () => {
   it('renders with RECEPTION text', () => {

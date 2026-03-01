@@ -8,12 +8,11 @@ describe('DogDistraction Station', () => {
     expect(getByText('THROW BALL')).toBeTruthy();
   });
 
-  it('should trigger onSuccess after 4 taps', () => {
+  it('should trigger onSuccess after 3 taps', () => {
     const mockOnSuccess = jest.fn();
     const { getByTestId } = render(<DogDistraction onSuccess={mockOnSuccess} />);
     const ball = getByTestId('dog-ball');
 
-    fireEvent.press(ball);
     fireEvent.press(ball);
     fireEvent.press(ball);
     expect(mockOnSuccess).not.toHaveBeenCalled();

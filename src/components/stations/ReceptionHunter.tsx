@@ -15,7 +15,7 @@ interface ReceptionHunterProps {
 
 const randomSweetSpot = () => Math.random() * 120 - 60;
 
-const HOLD_TICKS_REQUIRED = 40; // 40 * 50ms = 2s
+const HOLD_TICKS_REQUIRED = 20; // 20 * 50ms = 1s
 const TICK_MS = 50;
 
 export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) => {
@@ -60,9 +60,9 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
   const updatePosition = (x: number) => {
     const dist = Math.abs(x - sweetSpotX.current);
     let newBars = 0;
-    if (dist < 15) newBars = 3;
-    else if (dist < 35) newBars = 2;
-    else if (dist < 55) newBars = 1;
+    if (dist < 25) newBars = 3;
+    else if (dist < 45) newBars = 2;
+    else if (dist < 65) newBars = 1;
     setBars(newBars);
 
     if (newBars === 3) {

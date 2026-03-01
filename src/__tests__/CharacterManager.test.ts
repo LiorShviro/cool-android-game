@@ -37,7 +37,7 @@ describe('useCharacterManager', () => {
     renderHook(() => useCharacterManager());
 
     act(() => {
-      jest.advanceTimersByTime(3000); // Wait for spawn interval
+      jest.advanceTimersByTime(4000); // Wait for spawn interval
     });
 
     expect(mockAddCharacter).toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('useCharacterManager', () => {
     const { rerender } = renderHook(() => useCharacterManager());
 
     act(() => {
-      jest.advanceTimersByTime(3000);
+      jest.advanceTimersByTime(4000);
     });
 
     expect(mockAddCharacter).toHaveBeenCalled();

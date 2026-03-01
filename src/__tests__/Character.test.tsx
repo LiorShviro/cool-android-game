@@ -36,19 +36,18 @@ describe('Character Component', () => {
 
   it('renders correctly with character details', () => {
     const { getByText } = render(<Character character={mockCharacter} />);
-    
-    expect(getByText('ADULT')).toBeTruthy();
-    expect(getByText('WATER')).toBeTruthy();
+
+    expect(getByText("💧 I'm thirsty!")).toBeTruthy();
   });
 
   it('calls updateStressMeter and removeCharacter on timer expiration', () => {
     render(<Character character={mockCharacter} />);
-    
+
     act(() => {
       jest.runAllTimers();
     });
-    
-    expect(mockUpdateStressMeter).toHaveBeenCalledWith(10);
+
+    expect(mockUpdateStressMeter).toHaveBeenCalledWith(7);
     expect(mockRemoveCharacter).toHaveBeenCalledWith('1');
   });
 });

@@ -16,11 +16,11 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
         useNativeDriver: false,
       }),
       onPanResponderRelease: (e, gestureState) => {
-        if (gestureState.dx > 50) {
+        if (gestureState.dx > 30) {
           // Swipe Right
           hapticService.success();
           onSuccess('BAMBA');
-        } else if (gestureState.dx < -50) {
+        } else if (gestureState.dx < -30) {
           // Swipe Left
           hapticService.success();
           onSuccess('BISLI');

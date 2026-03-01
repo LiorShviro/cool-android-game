@@ -23,7 +23,7 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
 
   useEffect(() => {
     phoneX.value = withRepeat(
-      withTiming(50, { duration: 1500, easing: Easing.linear }),
+      withTiming(50, { duration: 2500, easing: Easing.linear }),
       -1,
       true,
     );
@@ -49,7 +49,7 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
     })
     .onEnd(() => {
       const dist = Math.abs(plugX.value - phoneX.value);
-      if (dist < 25 && plugY.value < -40) {
+      if (dist < 40 && plugY.value < -25) {
         runOnJS(handleSuccess)();
       } else {
         runOnJS(handleMiss)();
