@@ -58,6 +58,7 @@ const App = () => {
         <View style={styles.centered}>
           <Text style={styles.title}>Mamad Manager</Text>
           <Text style={styles.subtitle}>Safe Room Chaos</Text>
+          <Text style={styles.versionText}>Build: 1.0 (Local)</Text>
           
           {leaderboard.length > 0 && (
             <View style={styles.leaderboardContainer}>
@@ -149,6 +150,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
     marginBottom: 40,
+  },
+  versionText: {
+    fontSize: 12,
+    color: '#AAA',
+    marginBottom: 20,
   },
   mainButton: {
     backgroundColor: '#00C851',
