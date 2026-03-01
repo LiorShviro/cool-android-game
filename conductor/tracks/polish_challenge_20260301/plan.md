@@ -21,7 +21,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) (137db57)
 
 ## Phase 4: Main Menu Extensions (Tutorial & Leaderboard)
-- [ ] Task: Refactor `App.tsx` navigation to support different menu views (MENU, PLAYING, TUTORIAL, LEADERBOARD, GAME_OVER).
-- [ ] Task: Implement the `TutorialScreen` component.
-- [ ] Task: Implement the dedicated `LeaderboardScreen` component (full history).
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Refactor `App.tsx` navigation to support different menu views (MENU, PLAYING, TUTORIAL, LEADERBOARD, GAME_OVER). (6d00ba8)
+- [x] Task: Implement the `TutorialScreen` component. (eaffd53)
+- [x] Task: Implement the dedicated `LeaderboardScreen` component (full history). (eaffd53)
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md) (ecfa5d9)
