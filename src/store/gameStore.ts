@@ -4,6 +4,8 @@ export enum GameState {
   START = 'START',
   PLAYING = 'PLAYING',
   GAME_OVER = 'GAME_OVER',
+  TUTORIAL = 'TUTORIAL',
+  LEADERBOARD = 'LEADERBOARD',
 }
 
 export type CharacterType = 'ADULT' | 'KID' | 'DOG';
