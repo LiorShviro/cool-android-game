@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useGameStore, GameState } from './src/store/gameStore';
 import { CharacterManager } from './src/components/CharacterManager';
 import { Character } from './src/components/Character';
@@ -145,7 +146,11 @@ const App = () => {
     );
   };
 
-  return renderScreen();
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      {renderScreen()}
+    </GestureHandlerRootView>
+  );
 };
 
 const styles = StyleSheet.create({
