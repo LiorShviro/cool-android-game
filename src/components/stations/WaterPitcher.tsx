@@ -1,15 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  cancelAnimation,
-  Easing,
-} from 'react-native-reanimated';
+import { useSharedValue, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import { hapticService } from '../../services/hapticService';
 import { CupSvg } from '../../assets/svg/stations/CupSvg';
 import { THEME } from '../../assets/theme';
+import { useUIScale } from '../../hooks/useUIScale';
 
 interface WaterPitcherProps {
   onSuccess: () => void;
@@ -19,6 +14,33 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const [isLocked, setIsLocked] = useState(false);
   const fillProgress = useSharedValue(0);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { scale } = useUIScale();
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        minWidth: Math.round(130 * scale),
+        margin: Math.round(8 * scale),
+        paddingBottom: Math.round(12 * scale),
+      },
+      shelfTop: {
+        paddingVertical: Math.round(6 * scale),
+      },
+      stationLabel: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      button: {
+        paddingVertical: Math.round(9 * scale),
+        paddingHorizontal: Math.round(16 * scale),
+      },
+      buttonText: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      lockText: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+    }),
+    [scale]
+  );
 
   const handlePressIn = () => {
     if (isLocked) return;
@@ -60,18 +82,18 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, scaledStyles.container]}>
       {/* Station label shelf */}
-      <View style={styles.shelfTop}>
-        <Text style={styles.stationLabel}>WATER</Text>
+      <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
+        <Text style={[styles.stationLabel, scaledStyles.stationLabel]}>WATER</Text>
       </View>
 
       {/* Cup visual */}
       <View style={styles.cupWrapper}>
-        <CupSvg fillProgress={fillProgress} isOverfilled={isLocked} />
+        <CupSvg fillProgress={fillProgress} isOverfilled={isLocked} scale={scale} />
         {isLocked && (
           <View style={styles.lockOverlay}>
-            <Text style={styles.lockText}>LOCKED</Text>
+            <Text style={[styles.lockText, scaledStyles.lockText]}>LOCKED</Text>
           </View>
         )}
       </View>
@@ -82,12 +104,13 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
         onPressOut={handlePressOut}
         style={({ pressed }) => [
           styles.button,
+          scaledStyles.button,
           pressed && !isLocked && styles.buttonPressed,
           isLocked && styles.buttonLocked,
         ]}
         disabled={isLocked}
       >
-        <Text style={styles.buttonText}>{isLocked ? 'WIPING...' : 'POUR'}</Text>
+        <Text style={[styles.buttonText, scaledStyles.buttonText]}>{isLocked ? 'WIPING...' : 'POUR'}</Text>
       </Pressable>
     </View>
   );

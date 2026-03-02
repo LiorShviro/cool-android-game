@@ -4,9 +4,9 @@ import {
   StyleSheet,
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   ScrollView,
-  useWindowDimensions,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -26,20 +26,54 @@ import { TutorialScreen } from './src/components/TutorialScreen';
 import { LeaderboardScreen } from './src/components/LeaderboardScreen';
 import { MamadRoom } from './src/assets/svg/backgrounds/MamadRoom';
 import { THEME } from './src/assets/theme';
+import { useUIScale } from './src/hooks/useUIScale';
 
 const App = () => {
   const {
     gameState,
     setGameState,
+    startNewRun,
+    playerName,
+    setPlayerName,
+    pausedScreen,
+    setPausedScreen,
+    isPaused,
     activeCharacters,
     score,
     comboStreak,
+    maxCombo,
+    needsFulfilled,
+    needsFulfilledByNeed,
+    missedNeeds,
+    runStartedAt,
+    runEndedAt,
     fulfillNeed,
-    reset,
   } = useGameStore();
-  const { width, height } = useWindowDimensions();
+  const { width, height, scale } = useUIScale();
+  const [nameInput, setNameInput] = useState('');
+  const scaledLayout = React.useMemo(
+    () => ({
+      characterZone: {
+        minHeight: Math.round(230 * scale),
+      },
+      stationArea: {
+        height: Math.round(230 * scale),
+      },
+      stationScroll: {
+        paddingHorizontal: Math.round(10 * scale),
+        paddingVertical: Math.round(8 * scale),
+      },
+    }),
+    [scale]
+  );
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    const savedName = storageService.getPlayerName();
+    setPlayerName(savedName);
+    setNameInput(savedName);
+  }, [setPlayerName]);
 
   useEffect(() => {
     if (gameState === GameState.START || gameState === GameState.GAME_OVER || gameState === GameState.LEADERBOARD) {
@@ -49,20 +83,47 @@ const App = () => {
 
   useEffect(() => {
     if (gameState === GameState.GAME_OVER) {
+      const resolvedName = playerName.trim() !== '' ? playerName.trim() : 'Guest';
       const newEntry = {
-        name: 'Guest',
+        name: resolvedName,
         score: score,
         date: new Date().toISOString(),
       };
       storageService.saveScore(newEntry);
       setLeaderboard(storageService.getLeaderboard());
     }
-  }, [gameState, score]);
+  }, [gameState, playerName, score]);
+
+  const normalizeName = (value: string) => value.replace(/\s+/g, ' ').trim().slice(0, 14);
+
+  const handleSaveName = () => {
+    const cleaned = normalizeName(nameInput);
+    const finalName = cleaned !== '' ? cleaned : 'Guest';
+    setNameInput(finalName);
+    setPlayerName(finalName);
+    storageService.setPlayerName(finalName);
+  };
 
   const startGame = () => {
-    reset();
-    setGameState(GameState.PLAYING);
+    handleSaveName();
+    startNewRun();
   };
+
+  const formatDuration = (ms: number) => {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const needSummary = [
+    { key: 'WATER', label: 'WATER' },
+    { key: 'BISLI', label: 'BISLI' },
+    { key: 'BAMBA', label: 'BAMBA' },
+    { key: 'PET', label: 'DOG' },
+    { key: 'CHARGING', label: 'CHARGE' },
+    { key: 'RECEPTION', label: 'RECEPTION' },
+  ];
 
   const renderScreen = () => {
     if (gameState === GameState.START) {
@@ -77,6 +138,25 @@ const App = () => {
             <Text style={styles.title}>Mamad Manager</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
             <Text style={styles.versionText}>Build: 1.0 (Local)</Text>
+
+            <View style={styles.nameCard}>
+              <Text style={styles.nameLabel}>PLAYER NAME</Text>
+              <View style={styles.nameInputRow}>
+                <TextInput
+                  style={styles.nameInput}
+                  value={nameInput}
+                  onChangeText={setNameInput}
+                  onBlur={handleSaveName}
+                  placeholder="Your name"
+                  placeholderTextColor="#999"
+                  maxLength={14}
+                  autoCorrect={false}
+                />
+                <TouchableOpacity style={styles.nameSaveButton} onPress={handleSaveName}>
+                  <Text style={styles.nameSaveText}>SAVE</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
             <TouchableOpacity style={styles.mainButton} onPress={startGame}>
               <Text style={styles.buttonText}>▶  START GAME</Text>
@@ -97,6 +177,8 @@ const App = () => {
     if (gameState === GameState.GAME_OVER) {
       const leaderboardPosition = leaderboard.findIndex((e) => e.score === score) + 1;
       const positionText = leaderboardPosition > 0 ? `#${leaderboardPosition} on leaderboard` : '';
+      const durationMs = runStartedAt && runEndedAt ? runEndedAt - runStartedAt : 0;
+      const durationText = formatDuration(durationMs);
 
       return (
         <SafeAreaView style={styles.fullScreen}>
@@ -114,6 +196,35 @@ const App = () => {
             {positionText !== '' && (
               <Text style={styles.positionText}>{positionText}</Text>
             )}
+
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>TIME</Text>
+                <Text style={styles.summaryValue}>{durationText}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>FULFILLED</Text>
+                <Text style={styles.summaryValue}>{needsFulfilled}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>MISSED</Text>
+                <Text style={styles.summaryValue}>{missedNeeds}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>MAX COMBO</Text>
+                <Text style={styles.summaryValue}>{maxCombo}</Text>
+              </View>
+            </View>
+
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryTitle}>NEEDS FILLED</Text>
+              {needSummary.map((item) => (
+                <View key={item.key} style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>{item.label}</Text>
+                  <Text style={styles.summaryValue}>{needsFulfilledByNeed[item.key as keyof typeof needsFulfilledByNeed] ?? 0}</Text>
+                </View>
+              ))}
+            </View>
 
             <TouchableOpacity style={styles.mainButton} onPress={startGame}>
               <Text style={styles.buttonText}>TRY AGAIN</Text>
@@ -152,8 +263,23 @@ const App = () => {
 
         <GameHUD />
 
+        {isPaused && pausedScreen === 'TUTORIAL' && (
+          <View style={styles.pausedScreenOverlay}>
+            <TutorialScreen onBack={() => setPausedScreen('NONE')} />
+          </View>
+        )}
+
+        {isPaused && pausedScreen === 'LEADERBOARD' && (
+          <View style={styles.pausedScreenOverlay}>
+            <LeaderboardScreen
+              entries={leaderboard}
+              onBack={() => setPausedScreen('NONE')}
+            />
+          </View>
+        )}
+
         <View style={styles.gameArea}>
-          <View style={styles.characterZone}>
+          <View style={[styles.characterZone, scaledLayout.characterZone]}>
             {activeCharacters.map((char) => (
               <Character key={char.id} character={char} />
             ))}
@@ -161,9 +287,9 @@ const App = () => {
         </View>
 
         {/* Station shelf area */}
-        <View style={styles.stationArea}>
+        <View style={[styles.stationArea, scaledLayout.stationArea]}>
           <View style={styles.shelfEdge} />
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.stationScroll}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.stationScroll, scaledLayout.stationScroll]}>
             <WaterPitcher onSuccess={() => fulfillNeed('WATER')} />
             <SnackSorter onSuccess={(snack) => fulfillNeed(snack)} />
             <DogDistraction onSuccess={() => fulfillNeed('PET')} />
@@ -243,6 +369,56 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 24,
   },
+  nameCard: {
+    width: '100%',
+    backgroundColor: THEME.colors.offWhite,
+    borderRadius: THEME.borderRadius.medium,
+    padding: 12,
+    marginBottom: 18,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  nameLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#777',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  nameInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  nameInput: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: THEME.borderRadius.pill,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    fontSize: 14,
+    color: THEME.colors.outline,
+  },
+  nameSaveButton: {
+    backgroundColor: THEME.colors.blue,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: THEME.borderRadius.pill,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
+  },
+  nameSaveText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   mainButton: {
     backgroundColor: THEME.colors.green,
     paddingVertical: 15,
@@ -320,6 +496,38 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 20,
   },
+  summaryCard: {
+    width: '100%',
+    backgroundColor: THEME.colors.offWhite,
+    borderRadius: THEME.borderRadius.medium,
+    padding: 14,
+    marginBottom: 18,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+  },
+  summaryTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    color: '#777',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  summaryValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+  },
   gameArea: {
     flex: 1,
     justifyContent: 'center',
@@ -347,6 +555,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     alignItems: 'center',
+  },
+  pausedScreenOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.75)',
   },
 });
 

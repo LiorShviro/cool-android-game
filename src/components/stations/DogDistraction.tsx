@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -11,6 +11,7 @@ import Animated, {
 import { hapticService } from '../../services/hapticService';
 import { TennisBallSvg } from '../../assets/svg/stations/TennisBallSvg';
 import { THEME } from '../../assets/theme';
+import { useUIScale } from '../../hooks/useUIScale';
 
 interface DogDistractionProps {
   onSuccess: () => void;
@@ -19,17 +20,49 @@ interface DogDistractionProps {
 export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => {
   const [taps, setTaps] = useState(0);
   const translateY = useSharedValue(0);
+  const { scale } = useUIScale();
+  const bounceHeight = -48 * scale;
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        minWidth: Math.round(130 * scale),
+        margin: Math.round(8 * scale),
+        paddingBottom: Math.round(12 * scale),
+      },
+      shelfTop: {
+        paddingVertical: Math.round(6 * scale),
+      },
+      stationLabel: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      court: {
+        width: Math.round(120 * scale),
+        height: Math.round(125 * scale),
+        marginTop: Math.round(8 * scale),
+        paddingBottom: Math.round(26 * scale),
+      },
+      ground: {
+        height: Math.round(22 * scale),
+      },
+      tapDot: {
+        width: Math.round(8 * scale),
+        height: Math.round(8 * scale),
+        borderRadius: Math.round(4 * scale),
+      },
+    }),
+    [scale]
+  );
 
   useEffect(() => {
     translateY.value = withRepeat(
       withSequence(
-        withTiming(-48, { duration: 500, easing: Easing.out(Easing.quad) }),
+        withTiming(bounceHeight, { duration: 500, easing: Easing.out(Easing.quad) }),
         withTiming(0, { duration: 500, easing: Easing.in(Easing.quad) })
       ),
       -1,
       true
     );
-  }, []);
+  }, [bounceHeight, translateY]);
 
   const handleTap = () => {
     hapticService.light();
@@ -50,18 +83,18 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
   const tapsLeft = taps > 0 ? 3 - taps : 0;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.shelfTop}>
-        <Text style={styles.stationLabel}>THROW BALL</Text>
+    <View style={[styles.container, scaledStyles.container]}>
+      <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
+        <Text style={[styles.stationLabel, scaledStyles.stationLabel]}>THROW BALL</Text>
       </View>
 
-      <View style={styles.court}>
+      <View style={[styles.court, scaledStyles.court]}>
         {/* Grass ground */}
-        <View style={styles.ground} />
+        <View style={[styles.ground, scaledStyles.ground]} />
 
         <Pressable testID="dog-ball" onPress={handleTap}>
           <Animated.View style={animatedBallStyle}>
-            <TennisBallSvg size={44} tapsLeft={tapsLeft} />
+            <TennisBallSvg size={Math.round(50 * scale)} tapsLeft={tapsLeft} />
           </Animated.View>
         </Pressable>
 
@@ -70,7 +103,7 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
           {[0, 1, 2].map((i) => (
             <View
               key={i}
-              style={[styles.tapDot, i < taps && styles.tapDotFilled]}
+              style={[styles.tapDot, scaledStyles.tapDot, i < taps && styles.tapDotFilled]}
             />
           ))}
         </View>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -10,17 +10,18 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
 import Svg, { Rect, Path, Circle, G } from 'react-native-svg';
 import { THEME } from '../../assets/theme';
+import { useUIScale } from '../../hooks/useUIScale';
 
 interface ReceptionHunterProps {
   onSuccess: () => void;
 }
 
-const randomSweetSpot = () => Math.random() * 120 - 60;
+const randomSweetSpot = (range: number) => Math.random() * (range * 2) - range;
 const HOLD_TICKS_REQUIRED = 20;
 const TICK_MS = 50;
 
-const HandWithPhoneSvg: React.FC<{ bars: number }> = ({ bars }) => (
-  <Svg width={44} height={50} viewBox="0 0 44 50">
+const HandWithPhoneSvg: React.FC<{ bars: number; scale?: number }> = ({ bars, scale = 1 }) => (
+  <Svg width={Math.round(44 * scale)} height={Math.round(50 * scale)} viewBox="0 0 44 50">
     {/* Phone */}
     <Rect x={14} y={0} width={20} height={30} rx={3} fill="#222" stroke={THEME.colors.outline} strokeWidth={1.5} />
     <Rect x={16} y={3} width={16} height={20} rx={1} fill="#4A90D9" />
@@ -53,12 +54,54 @@ const HandWithPhoneSvg: React.FC<{ bars: number }> = ({ bars }) => (
 );
 
 export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) => {
-  const sweetSpotX = useRef(randomSweetSpot());
+  const { scale } = useUIScale();
+  const clampRange = 60 * scale;
+  const sweetSpotX = useRef(randomSweetSpot(clampRange));
   const handX = useSharedValue(0);
   const [bars, setBars] = useState(0);
   const [holdProgress, setHoldProgress] = useState(0);
   const holdTicksRef = useRef(0);
   const holdIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        minWidth: Math.round(130 * scale),
+        margin: Math.round(8 * scale),
+        paddingBottom: Math.round(12 * scale),
+      },
+      shelfTop: {
+        paddingVertical: Math.round(6 * scale),
+      },
+      stationLabel: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      track: {
+        width: Math.round(120 * scale),
+        height: Math.round(155 * scale),
+        marginTop: Math.round(8 * scale),
+        paddingVertical: Math.round(10 * scale),
+      },
+      signalDisplay: {
+        height: Math.round(40 * scale),
+        gap: Math.round(5 * scale),
+      },
+      bar: {
+        width: Math.round(12 * scale),
+      },
+      holdBarContainer: {
+        width: Math.round(92 * scale),
+        height: Math.round(10 * scale),
+      },
+      handTrack: {
+        width: Math.round(92 * scale),
+        height: Math.round(60 * scale),
+      },
+    }),
+    [scale]
+  );
+  const bar3Dist = 25 * scale;
+  const bar2Dist = 45 * scale;
+  const bar1Dist = 65 * scale;
 
   const stopHoldTimer = () => {
     if (holdIntervalRef.current) {
@@ -72,7 +115,7 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
   const handleSuccess = () => {
     hapticService.success();
     onSuccess();
-    sweetSpotX.current = randomSweetSpot();
+    sweetSpotX.current = randomSweetSpot(clampRange);
     handX.value = withSpring(0);
     setBars(0);
     stopHoldTimer();
@@ -94,9 +137,9 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
   const updatePosition = (x: number) => {
     const dist = Math.abs(x - sweetSpotX.current);
     let newBars = 0;
-    if (dist < 25) newBars = 3;
-    else if (dist < 45) newBars = 2;
-    else if (dist < 65) newBars = 1;
+    if (dist < bar3Dist) newBars = 3;
+    else if (dist < bar2Dist) newBars = 2;
+    else if (dist < bar1Dist) newBars = 1;
     setBars(newBars);
     if (newBars === 3) startHoldTimer();
     else stopHoldTimer();
@@ -113,9 +156,13 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
     };
   }, []);
 
+  useEffect(() => {
+    sweetSpotX.current = randomSweetSpot(clampRange);
+  }, [clampRange]);
+
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
-      const clampedX = Math.max(-60, Math.min(60, e.translationX));
+      const clampedX = Math.max(-clampRange, Math.min(clampRange, e.translationX));
       handX.value = clampedX;
       runOnJS(updatePosition)(clampedX);
     })
@@ -129,20 +176,21 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
   }));
 
   return (
-    <View style={styles.container}>
-      <View style={styles.shelfTop}>
-        <Text style={styles.stationLabel}>RECEPTION</Text>
+    <View style={[styles.container, scaledStyles.container]}>
+      <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
+        <Text style={[styles.stationLabel, scaledStyles.stationLabel]}>RECEPTION</Text>
       </View>
 
-      <View style={styles.track}>
+      <View style={[styles.track, scaledStyles.track]}>
         {/* Signal bars display */}
-        <View style={styles.signalDisplay}>
+        <View style={[styles.signalDisplay, scaledStyles.signalDisplay]}>
           {[1, 2, 3].map((n) => (
             <View
               key={n}
               style={[
                 styles.bar,
-                { height: 8 + n * 7 },
+                scaledStyles.bar,
+                { height: Math.round((8 + n * 7) * scale) },
                 bars >= n ? styles.barActive : styles.barInactive,
               ]}
             />
@@ -150,15 +198,15 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
         </View>
 
         {/* Hold progress bar */}
-        <View style={styles.holdBarContainer}>
+        <View style={[styles.holdBarContainer, scaledStyles.holdBarContainer]}>
           <View style={[styles.holdBarFill, { width: `${Math.round(holdProgress * 100)}%` }]} />
         </View>
 
         {/* Hand with phone */}
-        <View style={styles.handTrack}>
+        <View style={[styles.handTrack, scaledStyles.handTrack]}>
           <GestureDetector gesture={panGesture}>
             <Animated.View style={[styles.hand, handAnimStyle]} testID="reception-hand">
-              <HandWithPhoneSvg bars={bars} />
+              <HandWithPhoneSvg bars={bars} scale={scale} />
             </Animated.View>
           </GestureDetector>
         </View>

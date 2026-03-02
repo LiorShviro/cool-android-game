@@ -48,8 +48,18 @@ export interface LeaderboardEntry {
 }
 
 const LEADERBOARD_KEY = 'mamad_leaderboard';
+const PLAYER_NAME_KEY = 'mamad_player_name';
 
 export const storageService = {
+  getPlayerName: (): string => {
+    const data = store.getString(PLAYER_NAME_KEY);
+    return data && data.trim() !== '' ? data : 'Guest';
+  },
+
+  setPlayerName: (name: string) => {
+    store.set(PLAYER_NAME_KEY, name);
+  },
+
   getRank: (score: number): string => {
     if (score >= 3001) return 'Chief of Home Front';
     if (score >= 1501) return 'Safe Room Pro';

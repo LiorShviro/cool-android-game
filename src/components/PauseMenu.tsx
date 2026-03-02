@@ -4,7 +4,7 @@ import { useGameStore, GameState } from '../store/gameStore';
 import { THEME } from '../assets/theme';
 
 export const PauseMenu: React.FC = () => {
-  const { isPaused, togglePause, setGameState, reset } = useGameStore();
+  const { isPaused, pausedScreen, togglePause, setPausedScreen, setGameState, reset } = useGameStore();
 
   const handleQuit = () => {
     reset();
@@ -14,7 +14,7 @@ export const PauseMenu: React.FC = () => {
   return (
     <Modal
       transparent
-      visible={isPaused}
+      visible={isPaused && pausedScreen === 'NONE'}
       animationType="fade"
       onRequestClose={togglePause}
     >
@@ -30,6 +30,14 @@ export const PauseMenu: React.FC = () => {
 
           <TouchableOpacity style={styles.resumeButton} onPress={togglePause}>
             <Text style={styles.buttonText}>RESUME</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => setPausedScreen('TUTORIAL')}>
+            <Text style={styles.secondaryButtonText}>HOW TO PLAY</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => setPausedScreen('LEADERBOARD')}>
+            <Text style={styles.secondaryButtonText}>LEADERBOARD</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.quitButton} onPress={handleQuit}>
@@ -101,6 +109,21 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
     borderColor: THEME.colors.outline,
     elevation: 3,
+  },
+  secondaryButton: {
+    backgroundColor: THEME.colors.blue,
+    width: '100%',
+    paddingVertical: 12,
+    borderRadius: THEME.borderRadius.pill,
+    alignItems: 'center',
+    marginBottom: 10,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+  },
+  secondaryButtonText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
   quitButton: {
     backgroundColor: THEME.colors.offWhite,

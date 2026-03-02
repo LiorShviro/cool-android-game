@@ -33,6 +33,7 @@ describe('Character Component', () => {
     type: 'ADULT' as const,
     need: 'WATER',
     timer: 15000,
+    status: 'ACTIVE' as const,
   };
 
   it('renders correctly with character speech line', () => {
@@ -50,6 +51,6 @@ describe('Character Component', () => {
     });
     
     expect(mockDecrementLives).toHaveBeenCalled();
-    expect(mockRemoveCharacter).toHaveBeenCalledWith('1');
+    expect(mockRemoveCharacter).toHaveBeenCalledWith('1', 'EXPIRED');
   });
 });

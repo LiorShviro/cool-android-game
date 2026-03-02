@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, PanResponder, Animated } from 'react-native';
 import { hapticService } from '../../services/hapticService';
 import { SnackBagSvg } from '../../assets/svg/stations/SnackBagSvg';
 import { THEME } from '../../assets/theme';
+import { useUIScale } from '../../hooks/useUIScale';
 
 interface SnackSorterProps {
   onSuccess: (snack: 'BAMBA' | 'BISLI') => void;
@@ -10,6 +11,43 @@ interface SnackSorterProps {
 
 export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
   const pan = useRef(new Animated.ValueXY()).current;
+  const { scale } = useUIScale();
+  const swipeThreshold = 30 * scale;
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        minWidth: Math.round(230 * scale),
+        margin: Math.round(8 * scale),
+        paddingBottom: Math.round(12 * scale),
+      },
+      shelfTop: {
+        paddingVertical: Math.round(6 * scale),
+      },
+      stationLabel: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      sorterArea: {
+        width: Math.round(230 * scale),
+        height: Math.round(115 * scale),
+        marginTop: Math.round(6 * scale),
+        paddingHorizontal: Math.round(10 * scale),
+      },
+      sideLabel: {
+        width: Math.round(50 * scale),
+      },
+      sideLabelText: {
+        fontSize: Math.max(9, Math.round(10 * scale)),
+      },
+      arrowText: {
+        fontSize: Math.max(14, Math.round(16 * scale)),
+      },
+      snackSize: {
+        width: Math.round(60 * scale),
+        height: Math.round(80 * scale),
+      },
+    }),
+    [scale]
+  );
 
   const panResponder = useRef(
     PanResponder.create({
@@ -18,10 +56,10 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
         useNativeDriver: false,
       }),
       onPanResponderRelease: (e, gestureState) => {
-        if (gestureState.dx > 30) {
+        if (gestureState.dx > swipeThreshold) {
           hapticService.success();
           onSuccess('BAMBA');
-        } else if (gestureState.dx < -30) {
+        } else if (gestureState.dx < -swipeThreshold) {
           hapticService.success();
           onSuccess('BISLI');
         } else {
@@ -37,16 +75,16 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
   ).current;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.shelfTop}>
-        <Text style={styles.stationLabel}>SNACKS</Text>
+    <View style={[styles.container, scaledStyles.container]}>
+      <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
+        <Text style={[styles.stationLabel, scaledStyles.stationLabel]}>SNACKS</Text>
       </View>
 
-      <View style={styles.sorterArea}>
+      <View style={[styles.sorterArea, scaledStyles.sorterArea]}>
         {/* Left label */}
-        <View style={styles.sideLabel}>
-          <Text style={styles.sideLabelText}>BISLI</Text>
-          <Text style={styles.arrowText}>←</Text>
+        <View style={[styles.sideLabel, scaledStyles.sideLabel]}>
+          <Text style={[styles.sideLabelText, scaledStyles.sideLabelText]}>BISLI</Text>
+          <Text style={[styles.arrowText, scaledStyles.arrowText]}>←</Text>
         </View>
 
         {/* Draggable snack bag */}
@@ -58,13 +96,13 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
           ]}
           {...panResponder.panHandlers}
         >
-          <SnackBagSvg type="SNACK" width={52} height={70} />
+          <SnackBagSvg type="SNACK" width={scaledStyles.snackSize.width} height={scaledStyles.snackSize.height} />
         </Animated.View>
 
         {/* Right label */}
-        <View style={styles.sideLabel}>
-          <Text style={styles.arrowText}>→</Text>
-          <Text style={styles.sideLabelText}>BAMBA</Text>
+        <View style={[styles.sideLabel, scaledStyles.sideLabel]}>
+          <Text style={[styles.arrowText, scaledStyles.arrowText]}>→</Text>
+          <Text style={[styles.sideLabelText, scaledStyles.sideLabelText]}>BAMBA</Text>
         </View>
       </View>
     </View>

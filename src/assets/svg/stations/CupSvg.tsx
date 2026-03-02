@@ -7,13 +7,19 @@ import { THEME } from '../../theme';
 interface CupSvgProps {
   fillProgress: Animated.SharedValue<number>;
   isOverfilled: boolean;
+  scale?: number;
 }
 
-export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, isOverfilled }) => {
+export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, isOverfilled, scale = 1 }) => {
+  const width = Math.round(70 * scale);
+  const height = Math.round(100 * scale);
+  const waterHeightMax = Math.round(72 * scale);
+  const waterInset = Math.round(7 * scale);
+
   // Animate a View overlay inside the cup to represent water fill
   const waterStyle = useAnimatedStyle(() => {
     const pct = Math.min(1, fillProgress.value / 1.5);
-    const waterHeight = Math.max(0, pct * 72);
+    const waterHeight = Math.max(0, pct * waterHeightMax);
     return {
       height: waterHeight,
       backgroundColor: fillProgress.value > 1.2 ? '#FF4444' : '#33b5e5',
@@ -21,14 +27,14 @@ export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, isOverfilled }) =>
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width, height }]}>
       {/* Water fill overlay (behind SVG outline) */}
-      <View style={styles.waterContainer}>
+      <View style={[styles.waterContainer, { left: waterInset, right: waterInset, height: waterHeightMax, bottom: Math.round(8 * scale) }]}>
         <Animated.View style={[styles.water, waterStyle]} />
       </View>
 
       {/* Cup outline SVG */}
-      <Svg width={70} height={100} viewBox="0 0 70 100" style={StyleSheet.absoluteFill}>
+      <Svg width={width} height={height} viewBox="0 0 70 100" style={StyleSheet.absoluteFill}>
         {/* Cup body outline */}
         <Path
           d="M 6 10 L 64 10 L 58 92 L 12 92 Z"
@@ -59,8 +65,6 @@ export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, isOverfilled }) =>
 
 const styles = StyleSheet.create({
   container: {
-    width: 70,
-    height: 100,
     backgroundColor: 'white',
     // Cup trapezoid clip approximated with just the rect area
     borderBottomLeftRadius: 8,
@@ -70,9 +74,6 @@ const styles = StyleSheet.create({
   waterContainer: {
     position: 'absolute',
     bottom: 8,
-    left: 7,
-    right: 7,
-    height: 72,
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
