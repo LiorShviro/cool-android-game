@@ -1,12 +1,44 @@
-import { MMKV } from 'react-native-mmkv';
+let storage: import('react-native-mmkv').MMKV | null = null;
+let mmkvFailed = false;
 
-let storage: MMKV | null = null;
-
-const getStorage = (): MMKV => {
-  if (!storage) {
+const getStorage = () => {
+  if (mmkvFailed) return null;
+  if (storage) return storage;
+  try {
+    const { MMKV } = require('react-native-mmkv');
     storage = new MMKV();
+    return storage;
+  } catch {
+    mmkvFailed = true;
+    return null;
   }
-  return storage;
+};
+
+// In-memory fallback when MMKV is unavailable
+const memoryStore: Record<string, string> = {};
+
+const store = {
+  set: (key: string, value: string) => {
+    const s = getStorage();
+    if (s) {
+      s.set(key, value);
+    } else {
+      memoryStore[key] = value;
+    }
+  },
+  getString: (key: string): string | undefined => {
+    const s = getStorage();
+    if (s) return s.getString(key);
+    return memoryStore[key];
+  },
+  delete: (key: string) => {
+    const s = getStorage();
+    if (s) {
+      s.delete(key);
+    } else {
+      delete memoryStore[key];
+    }
+  },
 };
 
 export interface LeaderboardEntry {
@@ -26,16 +58,14 @@ export const storageService = {
   },
 
   saveScore: (entry: LeaderboardEntry) => {
-    const currentLeaderboard = storageService.getLeaderboard();
-    const newLeaderboard = [...currentLeaderboard, entry]
+    const newLeaderboard = [...storageService.getLeaderboard(), entry]
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
-    
-    getStorage().set(LEADERBOARD_KEY, JSON.stringify(newLeaderboard));
+    store.set(LEADERBOARD_KEY, JSON.stringify(newLeaderboard));
   },
 
   getLeaderboard: (): LeaderboardEntry[] => {
-    const data = getStorage().getString(LEADERBOARD_KEY);
+    const data = store.getString(LEADERBOARD_KEY);
     if (!data) return [];
     try {
       return JSON.parse(data);
@@ -45,6 +75,6 @@ export const storageService = {
   },
 
   clearLeaderboard: () => {
-    getStorage().delete(LEADERBOARD_KEY);
+    store.delete(LEADERBOARD_KEY);
   },
 };
