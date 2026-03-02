@@ -1,33 +1,54 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
 import { LeaderboardEntry, storageService } from '../services/storageService';
+import { THEME } from '../assets/theme';
 
 interface LeaderboardScreenProps {
   entries: LeaderboardEntry[];
   onBack: () => void;
 }
 
+const MEDALS = ['🥇', '🥈', '🥉'];
+
 export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ entries, onBack }) => {
-  const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
-    <View style={styles.entry}>
-      <View style={styles.rankInfo}>
-        <Text style={styles.rankNumber}>{index + 1}</Text>
-        <Text style={styles.rankTitle}>{storageService.getRank(item.score)}</Text>
+  const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => {
+    const isTop3 = index < 3;
+    const rowBg = index === 0 ? '#FFF3CC' : index === 1 ? '#F5F5F5' : index === 2 ? '#FFF0E8' : THEME.colors.offWhite;
+
+    return (
+      <View style={[styles.entry, isTop3 && styles.topEntry, { backgroundColor: rowBg }]}>
+        <View style={styles.rankCell}>
+          {isTop3 ? (
+            <Text style={styles.medal}>{MEDALS[index]}</Text>
+          ) : (
+            <Text style={styles.rankNumber}>{index + 1}</Text>
+          )}
+        </View>
+        <View style={styles.nameCell}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.rankTitle}>{storageService.getRank(item.score)}</Text>
+        </View>
+        <View style={styles.scoreCell}>
+          <Text style={[styles.score, isTop3 && styles.topScore]}>{item.score}</Text>
+        </View>
       </View>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.score}>{item.score}</Text>
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>LEADERBOARD</Text>
-        
-        <View style={styles.header}>
-          <Text style={styles.headerText}>RANK</Text>
-          <Text style={[styles.headerText, { flex: 1, marginLeft: 20 }]}>NAME</Text>
-          <Text style={styles.headerText}>SCORE</Text>
+        {/* Title */}
+        <View style={styles.titleBadge}>
+          <Text style={styles.titleIcon}>🏆</Text>
+          <Text style={styles.titleText}>LEADERBOARD</Text>
+        </View>
+
+        {/* Header row */}
+        <View style={styles.headerRow}>
+          <Text style={[styles.headerText, { width: 50 }]}>RANK</Text>
+          <Text style={[styles.headerText, { flex: 1 }]}>NAME</Text>
+          <Text style={[styles.headerText, { width: 60, textAlign: 'right' }]}>SCORE</Text>
         </View>
 
         <FlatList
@@ -35,8 +56,12 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ entries, o
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={styles.list}
+          style={styles.flatList}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No scores yet. Go play!</Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyIcon}>🎮</Text>
+              <Text style={styles.emptyText}>No scores yet. Go play!</Text>
+            </View>
           }
         />
 
@@ -51,88 +76,137 @@ export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ entries, o
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: 'transparent',
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 18,
     alignItems: 'center',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    color: '#333',
+  titleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.yellow,
+    borderRadius: THEME.borderRadius.large,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: THEME.colors.outline,
+    elevation: 4,
+    gap: 10,
   },
-  header: {
+  titleIcon: {
+    fontSize: 24,
+  },
+  titleText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+  },
+  headerRow: {
     flexDirection: 'row',
     width: '100%',
-    paddingHorizontal: 15,
-    marginBottom: 10,
+    paddingHorizontal: 14,
+    marginBottom: 8,
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
-    color: '#AAA',
+    color: '#888',
+    letterSpacing: 1,
+  },
+  flatList: {
+    width: '100%',
   },
   list: {
     width: '100%',
-    flexGrow: 0,
+    paddingBottom: 8,
   },
   entry: {
     flexDirection: 'row',
     width: '100%',
-    backgroundColor: 'white',
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 10,
+    padding: 12,
+    borderRadius: THEME.borderRadius.medium,
+    marginBottom: 8,
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
   },
-  rankInfo: {
-    width: 100,
+  topEntry: {
+    borderWidth: 2.5,
+    elevation: 4,
+  },
+  rankCell: {
+    width: 50,
+    alignItems: 'center',
   },
   rankNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#00C851',
+    color: '#888',
+  },
+  medal: {
+    fontSize: 24,
+  },
+  nameCell: {
+    flex: 1,
+    paddingLeft: 8,
+  },
+  name: {
+    fontSize: 15,
+    color: THEME.colors.outline,
+    fontWeight: 'bold',
   },
   rankTitle: {
     fontSize: 10,
-    color: '#666',
-    fontWeight: 'bold',
+    color: '#888',
+    fontWeight: '600',
   },
-  name: {
-    fontSize: 16,
-    color: '#333',
-    flex: 1,
-    marginLeft: 10,
+  scoreCell: {
+    width: 60,
+    alignItems: 'flex-end',
   },
   score: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: THEME.colors.outline,
+  },
+  topScore: {
+    color: THEME.colors.orange,
+    fontSize: 20,
+  },
+  emptyContainer: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 36,
+    marginBottom: 8,
   },
   emptyText: {
-    marginTop: 50,
     color: '#999',
     fontSize: 16,
   },
   backButton: {
-    backgroundColor: '#00C851',
-    paddingVertical: 15,
-    paddingHorizontal: 60,
-    borderRadius: 30,
-    marginTop: 20,
+    backgroundColor: THEME.colors.orange,
+    paddingVertical: 14,
+    paddingHorizontal: 50,
+    borderRadius: THEME.borderRadius.pill,
+    marginTop: 16,
     marginBottom: 20,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+    elevation: 4,
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: 'bold',
   },
 });

@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
+  withRepeat,
+  withSequence,
   interpolateColor,
   Easing,
   runOnJS,
@@ -12,16 +14,61 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
 import { hapticService } from '../services/hapticService';
-import { SPEECH_LINES, CHARACTER_EMOJIS } from '../constants/gameConstants';
+import { SPEECH_LINES } from '../constants/gameConstants';
+import { SabaCharacter, Mood } from '../assets/svg/characters/SabaCharacter';
+import { TeenCharacter } from '../assets/svg/characters/TeenCharacter';
+import { ParentCharacter } from '../assets/svg/characters/ParentCharacter';
+import { DogCharacter } from '../assets/svg/characters/DogCharacter';
+import { THEME } from '../assets/theme';
 
 interface CharacterProps {
   character: CharacterType;
 }
 
+const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number }> = ({ type, mood, variant }) => {
+  if (type === 'DOG') return <DogCharacter mood={mood} size={68} />;
+  if (type === 'KID') return <TeenCharacter mood={mood} size={62} />;
+  // ADULT: alternate between Saba and Parent based on variant
+  if (variant % 2 === 0) return <SabaCharacter mood={mood} size={62} />;
+  return <ParentCharacter mood={mood} size={62} />;
+};
+
 export const Character: React.FC<CharacterProps> = ({ character }) => {
   const { decrementLives, removeCharacter, isPaused } = useGameStore();
   const progress = useSharedValue(1);
+  const bobY = useSharedValue(0);
+  const isMounted = useSharedValue(true);
+  const lastMood = useSharedValue<Mood>('neutral');
   const isInitialMount = useRef(true);
+
+  // Deterministic visual variant per character
+  const variant = useMemo(() => {
+    const num = parseInt(character.id.replace(/\D/g, '').slice(-2) || '0', 10);
+    return num;
+  }, [character.id]);
+
+  const startBobAnimation = useCallback((durationMs: number) => {
+    bobY.value = withRepeat(
+      withSequence(
+        withTiming(-6, { duration: durationMs, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0, { duration: durationMs, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      true
+    );
+  }, [bobY]);
+
+  useEffect(() => {
+    startBobAnimation(600);
+  }, [startBobAnimation]);
+
+  useEffect(() => {
+    return () => {
+      isMounted.value = false;
+      cancelAnimation(progress);
+      cancelAnimation(bobY);
+    };
+  }, [bobY, isMounted, progress]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -30,7 +77,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         0,
         { duration: character.timer, easing: Easing.linear },
         (finished) => {
-          if (finished) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
         }
       );
       return;
@@ -38,32 +85,39 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 
     if (isPaused) {
       cancelAnimation(progress);
+      cancelAnimation(bobY);
     } else {
       const remaining = progress.value * character.timer;
       progress.value = withTiming(
         0,
         { duration: remaining, easing: Easing.linear },
         (finished) => {
-          if (finished) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
         }
       );
+      startBobAnimation(600);
     }
-  }, [isPaused]);
+  }, [character.timer, isMounted, isPaused, progress, startBobAnimation]);
 
+  // Speed up bob when urgent
   useAnimatedReaction(
     () => progress.value,
     (current, previous) => {
+      if (!isMounted.value) return;
       if (current < 0.2 && previous && previous >= 0.2) {
         runOnJS(hapticService.warning)();
+        runOnJS(startBobAnimation)(200);
+      } else if (current < 0.5 && previous && previous >= 0.5) {
+        runOnJS(startBobAnimation)(380);
       }
     }
   );
 
-  const handleTimerExpire = () => {
+  const handleTimerExpire = useCallback(() => {
     hapticService.error();
     decrementLives();
     removeCharacter(character.id);
-  };
+  }, [character.id, decrementLives, removeCharacter]);
 
   const timerBarStyle = useAnimatedStyle(() => {
     const color = interpolateColor(
@@ -86,10 +140,28 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     return { borderColor: color };
   });
 
-  const emoji = useMemo(() => {
-    const options = CHARACTER_EMOJIS[character.type] ?? ['👤'];
-    return options[Math.floor(Math.random() * options.length)];
-  }, [character.type]);
+  const bobStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: bobY.value }],
+  }));
+
+  const mood: Mood = useMemo(() => {
+    // We can't read shared values in useMemo, so we derive from character timer
+    // Mood is updated via state change — for initial render default to neutral
+    return 'neutral';
+  }, [character.id]);
+
+  const [currentMood, setCurrentMood] = React.useState<Mood>('neutral');
+  useAnimatedReaction(
+    () => progress.value,
+    (current) => {
+      if (!isMounted.value) return;
+      const newMood: Mood = current <= 0.2 ? 'urgent' : current <= 0.5 ? 'impatient' : 'neutral';
+      if (newMood !== lastMood.value) {
+        lastMood.value = newMood;
+        runOnJS(setCurrentMood)(newMood);
+      }
+    }
+  );
 
   const speechText = SPEECH_LINES[character.need] ?? character.need;
 
@@ -99,7 +171,9 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         <Text style={styles.speechText}>{speechText}</Text>
       </Animated.View>
       <View style={styles.bubbleTail} />
-      <Text style={styles.avatar}>{emoji}</Text>
+      <Animated.View style={bobStyle}>
+        <CharacterAvatar type={character.type} mood={currentMood} variant={variant} />
+      </Animated.View>
       <View style={styles.timerBarTrack}>
         <Animated.View style={[styles.timerBarFill, timerBarStyle]} />
       </View>
@@ -110,20 +184,20 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 8,
-    width: 90,
+    margin: 6,
+    width: 96,
   },
   speechBubble: {
-    backgroundColor: 'white',
+    backgroundColor: THEME.colors.offWhite,
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: 2.5,
     paddingHorizontal: 6,
     paddingVertical: 4,
-    maxWidth: 90,
+    maxWidth: 96,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 2,
   },
   speechText: {
@@ -140,17 +214,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 6,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: 'white',
+    borderTopColor: THEME.colors.offWhite,
     marginTop: -1,
   },
-  avatar: {
-    fontSize: 36,
-    marginTop: 2,
-  },
   timerBarTrack: {
-    width: 60,
-    height: 5,
-    backgroundColor: '#E0E0E0',
+    width: 64,
+    height: 6,
+    backgroundColor: 'rgba(0,0,0,0.15)',
     borderRadius: 3,
     overflow: 'hidden',
     marginTop: 4,

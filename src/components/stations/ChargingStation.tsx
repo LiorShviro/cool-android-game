@@ -11,10 +11,45 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
+import Svg, { Rect, Path, Circle, RoundedRect } from 'react-native-svg';
+import { THEME } from '../../assets/theme';
 
 interface ChargingStationProps {
   onSuccess: () => void;
 }
+
+const PhoneSvg: React.FC = () => (
+  <Svg width={38} height={52} viewBox="0 0 38 52">
+    <Rect x={1} y={1} width={36} height={50} rx={5} fill="#222" stroke={THEME.colors.outline} strokeWidth={2} />
+    <Rect x={4} y={5} width={30} height={36} rx={2} fill="#4A90D9" />
+    {/* Screen content lines */}
+    <Rect x={8} y={10} width={22} height={3} rx={1.5} fill="#88BBFF" opacity={0.7} />
+    <Rect x={8} y={16} width={18} height={3} rx={1.5} fill="#88BBFF" opacity={0.5} />
+    <Rect x={8} y={22} width={20} height={3} rx={1.5} fill="#88BBFF" opacity={0.5} />
+    {/* Battery indicator */}
+    <Rect x={13} y={27} width={12} height={8} rx={2} fill="none" stroke="#FF6060" strokeWidth={1.5} />
+    <Rect x={13} y={27} width={4} height={8} rx={2} fill="#FF6060" opacity={0.7} />
+    <Rect x={25} y={29} width={2} height={4} rx={1} fill="#FF6060" />
+    {/* Home button */}
+    <Circle cx={19} cy={47} r={2.5} fill="#555" stroke="#888" strokeWidth={1} />
+    {/* Charging port */}
+    <Rect x={15} y={48} width={8} height={3} rx={1.5} fill="#555" />
+  </Svg>
+);
+
+const PlugSvg: React.FC = () => (
+  <Svg width={30} height={38} viewBox="0 0 30 38">
+    {/* Cable body */}
+    <Rect x={12} y={0} width={6} height={16} rx={3} fill="#888" stroke={THEME.colors.outline} strokeWidth={1.5} />
+    {/* Plug head */}
+    <Rect x={6} y={14} width={18} height={14} rx={4} fill="#555" stroke={THEME.colors.outline} strokeWidth={2} />
+    {/* Prongs */}
+    <Rect x={9} y={28} width={4} height={10} rx={2} fill="#333" stroke={THEME.colors.outline} strokeWidth={1.5} />
+    <Rect x={17} y={28} width={4} height={10} rx={2} fill="#333" stroke={THEME.colors.outline} strokeWidth={1.5} />
+    {/* LED */}
+    <Circle cx={15} cy={21} r={2} fill="#00FF88" opacity={0.8} />
+  </Svg>
+);
 
 export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) => {
   const phoneX = useSharedValue(-50);
@@ -66,17 +101,20 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
 
   return (
     <View style={styles.container}>
+      <View style={styles.shelfTop}>
+        <Text style={styles.stationLabel}>CHARGE</Text>
+      </View>
+
       <View style={styles.track}>
         <Animated.View style={[styles.phone, phoneAnimStyle]}>
-          <Text style={styles.phoneIcon}>📱</Text>
+          <PhoneSvg />
         </Animated.View>
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.plug, plugAnimStyle]} testID="charging-plug">
-            <Text style={styles.plugIcon}>🔌</Text>
+            <PlugSvg />
           </Animated.View>
         </GestureDetector>
       </View>
-      <Text style={styles.title}>CHARGE</Text>
     </View>
   );
 };
@@ -84,41 +122,55 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 10,
+    margin: 8,
+    backgroundColor: THEME.colors.cream,
+    borderRadius: THEME.borderRadius.medium,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+    paddingBottom: 10,
+    minWidth: 110,
+  },
+  shelfTop: {
+    width: '100%',
+    backgroundColor: THEME.colors.woodLight,
+    borderTopLeftRadius: THEME.borderRadius.medium - 2,
+    borderTopRightRadius: THEME.borderRadius.medium - 2,
+    paddingVertical: 5,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: THEME.colors.outline,
+  },
+  stationLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
   },
   track: {
     width: 100,
-    height: 140,
-    backgroundColor: '#FFF9C4',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#F9A825',
+    height: 130,
+    backgroundColor: '#FFFDE0',
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: THEME.colors.outline,
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     overflow: 'hidden',
+    marginTop: 8,
   },
   phone: {
-    width: 40,
-    height: 50,
+    width: 38,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  phoneIcon: {
-    fontSize: 28,
   },
   plug: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 38,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  plugIcon: {
-    fontSize: 24,
-  },
-  title: {
-    marginTop: 8,
-    fontWeight: 'bold',
-    fontSize: 12,
   },
 });
