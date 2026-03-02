@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
-import { LeaderboardEntry } from '../services/storageService';
+import { LeaderboardEntry, storageService } from '../services/storageService';
 
 interface LeaderboardScreenProps {
   entries: LeaderboardEntry[];
@@ -10,7 +10,10 @@ interface LeaderboardScreenProps {
 export const LeaderboardScreen: React.FC<LeaderboardScreenProps> = ({ entries, onBack }) => {
   const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
     <View style={styles.entry}>
-      <Text style={styles.rank}>{index + 1}</Text>
+      <View style={styles.rankInfo}>
+        <Text style={styles.rankNumber}>{index + 1}</Text>
+        <Text style={styles.rankTitle}>{storageService.getRank(item.score)}</Text>
+      </View>
       <Text style={styles.name}>{item.name}</Text>
       <Text style={styles.score}>{item.score}</Text>
     </View>
@@ -90,17 +93,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  rank: {
+  rankInfo: {
+    width: 100,
+  },
+  rankNumber: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#00C851',
-    width: 30,
+  },
+  rankTitle: {
+    fontSize: 10,
+    color: '#666',
+    fontWeight: 'bold',
   },
   name: {
     fontSize: 16,
     color: '#333',
     flex: 1,
-    marginLeft: 20,
+    marginLeft: 10,
   },
   score: {
     fontSize: 18,

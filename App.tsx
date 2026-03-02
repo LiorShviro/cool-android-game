@@ -19,6 +19,8 @@ import { ReceptionHunter } from './src/components/stations/ReceptionHunter';
 import { PauseMenu } from './src/components/PauseMenu';
 import { ComboPopup } from './src/components/ComboPopup';
 import { storageService, LeaderboardEntry } from './src/services/storageService';
+import { TutorialScreen } from './src/components/TutorialScreen';
+import { LeaderboardScreen } from './src/components/LeaderboardScreen';
 
 const App = () => {
   const {
@@ -87,6 +89,7 @@ const App = () => {
           <View style={styles.centered}>
             <Text style={[styles.title, { color: '#FF4444' }]}>GAME OVER</Text>
             <Text style={styles.finalScore}>Final Score: {score}</Text>
+            <Text style={styles.rankText}>Rank: {storageService.getRank(score)}</Text>
             
             <TouchableOpacity style={styles.mainButton} onPress={startGame}>
               <Text style={styles.buttonText}>TRY AGAIN</Text>
@@ -101,32 +104,15 @@ const App = () => {
     }
 
     if (gameState === GameState.TUTORIAL) {
-        return (
-          <SafeAreaView style={styles.fullScreen}>
-            <View style={styles.centered}>
-              <Text style={styles.title}>Tutorial</Text>
-              <Text>Placeholder Tutorial Content</Text>
-              <TouchableOpacity style={styles.mainButton} onPress={() => setGameState(GameState.START)}>
-                <Text style={styles.buttonText}>BACK</Text>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-        );
+        return <TutorialScreen onBack={() => setGameState(GameState.START)} />;
     }
 
     if (gameState === GameState.LEADERBOARD) {
         return (
-          <SafeAreaView style={styles.fullScreen}>
-            <View style={styles.centered}>
-              <Text style={styles.title}>Leaderboard</Text>
-              {leaderboard.map((entry, index) => (
-                <Text key={index}>{index + 1}. {entry.name}: {entry.score}</Text>
-              ))}
-              <TouchableOpacity style={styles.mainButton} onPress={() => setGameState(GameState.START)}>
-                <Text style={styles.buttonText}>BACK</Text>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
+          <LeaderboardScreen 
+            entries={leaderboard} 
+            onBack={() => setGameState(GameState.START)} 
+          />
         );
     }
 
@@ -218,6 +204,12 @@ const styles = StyleSheet.create({
   },
   finalScore: {
     fontSize: 24,
+    marginBottom: 5,
+  },
+  rankText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00C851',
     marginBottom: 30,
   },
   header: {

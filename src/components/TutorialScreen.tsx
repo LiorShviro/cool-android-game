@@ -32,6 +32,16 @@ export const TutorialScreen: React.FC<TutorialScreenProps> = ({ onBack }) => {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>🔋 Charging Station</Text>
+          <Text style={styles.text}>Drag the dangling cable end and drop it directly into the port of the moving phone to charge it.</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📶 Reception Hunter</Text>
+          <Text style={styles.text}>Swipe the hand left and right to find the 'sweet spot' with 3 bars of signal. Hold it there for a moment to send the message.</Text>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>🔥 Combos</Text>
           <Text style={styles.text}>Fulfill needs quickly and without mistakes to increase your multiplier and get a higher score!</Text>
         </View>

@@ -14,10 +14,10 @@
 
 
 ## Phase 3: Finalizing Tutorial & Leaderboard
-- [ ] Task: Replace `TutorialScreen` placeholder content with detailed station guides.
-- [ ] Task: Implement score-based ranking logic in a utility function.
-- [ ] Task: Update `LeaderboardScreen` and `App.tsx` (GameOver) to display ranks.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Replace `TutorialScreen` placeholder content with detailed station guides. (Commit: manual update)
+- [x] Task: Implement score-based ranking logic in a utility function. (Commit: manual update)
+- [x] Task: Update `LeaderboardScreen` and `App.tsx` (GameOver) to display ranks. (Commit: manual update)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Integration & Final Polish
 - [ ] Task: Ensure all 5 stations are correctly balanced in the `App.tsx` station scroll view.
