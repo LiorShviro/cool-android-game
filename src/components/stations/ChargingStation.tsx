@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -11,15 +11,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
-import Svg, { Rect, Path, Circle, RoundedRect } from 'react-native-svg';
+import Svg, { Rect, Path, Circle } from 'react-native-svg';
 import { THEME } from '../../assets/theme';
+import { useUIScale } from '../../hooks/useUIScale';
 
 interface ChargingStationProps {
   onSuccess: () => void;
 }
 
-const PhoneSvg: React.FC = () => (
-  <Svg width={38} height={52} viewBox="0 0 38 52">
+const PhoneSvg: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
+  <Svg width={Math.round(38 * scale)} height={Math.round(52 * scale)} viewBox="0 0 38 52">
     <Rect x={1} y={1} width={36} height={50} rx={5} fill="#222" stroke={THEME.colors.outline} strokeWidth={2} />
     <Rect x={4} y={5} width={30} height={36} rx={2} fill="#4A90D9" />
     {/* Screen content lines */}
@@ -37,8 +38,8 @@ const PhoneSvg: React.FC = () => (
   </Svg>
 );
 
-const PlugSvg: React.FC = () => (
-  <Svg width={30} height={38} viewBox="0 0 30 38">
+const PlugSvg: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
+  <Svg width={Math.round(30 * scale)} height={Math.round(38 * scale)} viewBox="0 0 30 38">
     {/* Cable body */}
     <Rect x={12} y={0} width={6} height={16} rx={3} fill="#888" stroke={THEME.colors.outline} strokeWidth={1.5} />
     {/* Plug head */}
@@ -52,17 +53,51 @@ const PlugSvg: React.FC = () => (
 );
 
 export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) => {
-  const phoneX = useSharedValue(-50);
+  const { scale } = useUIScale();
+  const phoneRange = 50 * scale;
+  const phoneX = useSharedValue(-phoneRange);
   const plugX = useSharedValue(0);
   const plugY = useSharedValue(0);
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        minWidth: Math.round(130 * scale),
+        margin: Math.round(8 * scale),
+        paddingBottom: Math.round(12 * scale),
+      },
+      shelfTop: {
+        paddingVertical: Math.round(6 * scale),
+      },
+      stationLabel: {
+        fontSize: Math.max(11, Math.round(12 * scale)),
+      },
+      track: {
+        width: Math.round(120 * scale),
+        height: Math.round(150 * scale),
+        paddingVertical: Math.round(14 * scale),
+        marginTop: Math.round(8 * scale),
+      },
+      phone: {
+        width: Math.round(38 * scale),
+        height: Math.round(52 * scale),
+      },
+      plug: {
+        width: Math.round(30 * scale),
+        height: Math.round(38 * scale),
+      },
+    }),
+    [scale]
+  );
+  const successDist = 40 * scale;
+  const yThreshold = -25 * scale;
 
   useEffect(() => {
     phoneX.value = withRepeat(
-      withTiming(50, { duration: 2500, easing: Easing.linear }),
+      withTiming(phoneRange, { duration: 2500, easing: Easing.linear }),
       -1,
       true,
     );
-  }, [phoneX]);
+  }, [phoneRange, phoneX]);
 
   const handleSuccess = () => {
     hapticService.success();
@@ -84,7 +119,7 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
     })
     .onEnd(() => {
       const dist = Math.abs(plugX.value - phoneX.value);
-      if (dist < 40 && plugY.value < -25) {
+      if (dist < successDist && plugY.value < yThreshold) {
         runOnJS(handleSuccess)();
       } else {
         runOnJS(handleMiss)();
@@ -100,18 +135,18 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
   }));
 
   return (
-    <View style={styles.container}>
-      <View style={styles.shelfTop}>
-        <Text style={styles.stationLabel}>CHARGE</Text>
+    <View style={[styles.container, scaledStyles.container]}>
+      <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
+        <Text style={[styles.stationLabel, scaledStyles.stationLabel]}>CHARGE</Text>
       </View>
 
-      <View style={styles.track}>
-        <Animated.View style={[styles.phone, phoneAnimStyle]}>
-          <PhoneSvg />
+      <View style={[styles.track, scaledStyles.track]}>
+        <Animated.View style={[styles.phone, scaledStyles.phone, phoneAnimStyle]}>
+          <PhoneSvg scale={scale} />
         </Animated.View>
         <GestureDetector gesture={panGesture}>
-          <Animated.View style={[styles.plug, plugAnimStyle]} testID="charging-plug">
-            <PlugSvg />
+          <Animated.View style={[styles.plug, scaledStyles.plug, plugAnimStyle]} testID="charging-plug">
+            <PlugSvg scale={scale} />
           </Animated.View>
         </GestureDetector>
       </View>

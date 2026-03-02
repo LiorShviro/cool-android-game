@@ -20,17 +20,23 @@ import { TeenCharacter } from '../assets/svg/characters/TeenCharacter';
 import { ParentCharacter } from '../assets/svg/characters/ParentCharacter';
 import { DogCharacter } from '../assets/svg/characters/DogCharacter';
 import { THEME } from '../assets/theme';
+import { useUIScale } from '../hooks/useUIScale';
 
 interface CharacterProps {
   character: CharacterType;
 }
 
-const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number }> = ({ type, mood, variant }) => {
-  if (type === 'DOG') return <DogCharacter mood={mood} size={68} />;
-  if (type === 'KID') return <TeenCharacter mood={mood} size={62} />;
+const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number; size: number }> = ({
+  type,
+  mood,
+  variant,
+  size,
+}) => {
+  if (type === 'DOG') return <DogCharacter mood={mood} size={Math.round(size * 1.1)} />;
+  if (type === 'KID') return <TeenCharacter mood={mood} size={Math.round(size * 0.95)} />;
   // ADULT: alternate between Saba and Parent based on variant
-  if (variant % 2 === 0) return <SabaCharacter mood={mood} size={62} />;
-  return <ParentCharacter mood={mood} size={62} />;
+  if (variant % 2 === 0) return <SabaCharacter mood={mood} size={Math.round(size * 0.98)} />;
+  return <ParentCharacter mood={mood} size={Math.round(size * 0.98)} />;
 };
 
 export const Character: React.FC<CharacterProps> = ({ character }) => {
@@ -39,7 +45,9 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   const bobY = useSharedValue(0);
   const isMounted = useSharedValue(true);
   const lastMood = useSharedValue<Mood>('neutral');
+  const isFulfilled = useSharedValue(false);
   const isInitialMount = useRef(true);
+  const { scale } = useUIScale();
 
   // Deterministic visual variant per character
   const variant = useMemo(() => {
@@ -71,13 +79,24 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   }, [bobY, isMounted, progress]);
 
   useEffect(() => {
+    if (character.status !== 'FULFILLED') return;
+    isFulfilled.value = true;
+    cancelAnimation(progress);
+    cancelAnimation(bobY);
+    const removalTimer = setTimeout(() => {
+      removeCharacter(character.id, 'FULFILLED');
+    }, 450);
+    return () => clearTimeout(removalTimer);
+  }, [bobY, character.id, character.status, isFulfilled, progress, removeCharacter]);
+
+  useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       progress.value = withTiming(
         0,
         { duration: character.timer, easing: Easing.linear },
         (finished) => {
-          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value && !isFulfilled.value) runOnJS(handleTimerExpire)();
         }
       );
       return;
@@ -87,12 +106,13 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
       cancelAnimation(progress);
       cancelAnimation(bobY);
     } else {
+      if (isFulfilled.value) return;
       const remaining = progress.value * character.timer;
       progress.value = withTiming(
         0,
         { duration: remaining, easing: Easing.linear },
         (finished) => {
-          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value && !isFulfilled.value) runOnJS(handleTimerExpire)();
         }
       );
       startBobAnimation(600);
@@ -104,6 +124,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     () => progress.value,
     (current, previous) => {
       if (!isMounted.value) return;
+      if (isFulfilled.value) return;
       if (current < 0.2 && previous && previous >= 0.2) {
         runOnJS(hapticService.warning)();
         runOnJS(startBobAnimation)(200);
@@ -114,10 +135,11 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   );
 
   const handleTimerExpire = useCallback(() => {
+    if (isFulfilled.value) return;
     hapticService.error();
     decrementLives();
-    removeCharacter(character.id);
-  }, [character.id, decrementLives, removeCharacter]);
+    removeCharacter(character.id, 'EXPIRED');
+  }, [character.id, decrementLives, isFulfilled, removeCharacter]);
 
   const timerBarStyle = useAnimatedStyle(() => {
     const color = interpolateColor(
@@ -144,17 +166,12 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     transform: [{ translateY: bobY.value }],
   }));
 
-  const mood: Mood = useMemo(() => {
-    // We can't read shared values in useMemo, so we derive from character timer
-    // Mood is updated via state change — for initial render default to neutral
-    return 'neutral';
-  }, [character.id]);
-
   const [currentMood, setCurrentMood] = React.useState<Mood>('neutral');
   useAnimatedReaction(
     () => progress.value,
     (current) => {
       if (!isMounted.value) return;
+      if (isFulfilled.value) return;
       const newMood: Mood = current <= 0.2 ? 'urgent' : current <= 0.5 ? 'impatient' : 'neutral';
       if (newMood !== lastMood.value) {
         lastMood.value = newMood;
@@ -164,17 +181,58 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   );
 
   const speechText = SPEECH_LINES[character.need] ?? character.need;
+  const avatarSize = Math.round(72 * scale);
+  const scaledStyles = useMemo(
+    () => ({
+      container: {
+        width: Math.round(110 * scale),
+        margin: Math.round(8 * scale),
+      },
+      speechBubble: {
+        maxWidth: Math.round(110 * scale),
+        paddingHorizontal: Math.round(7 * scale),
+        paddingVertical: Math.round(5 * scale),
+        borderRadius: Math.round(12 * scale),
+        borderWidth: Math.max(2, Math.round(2.5 * scale)),
+      },
+      speechText: {
+        fontSize: Math.max(9, Math.round(10 * scale)),
+      },
+      bubbleTail: {
+        borderLeftWidth: Math.max(5, Math.round(6 * scale)),
+        borderRightWidth: Math.max(5, Math.round(6 * scale)),
+        borderTopWidth: Math.max(6, Math.round(7 * scale)),
+      },
+      timerBarTrack: {
+        width: Math.round(78 * scale),
+        height: Math.max(6, Math.round(7 * scale)),
+        marginTop: Math.round(4 * scale),
+      },
+      fulfilledBadge: {
+        transform: [{ scale }],
+      },
+      fulfilledText: {
+        fontSize: Math.max(10, Math.round(11 * scale)),
+      },
+    }),
+    [scale]
+  );
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.speechBubble, bubbleBorderStyle]}>
-        <Text style={styles.speechText}>{speechText}</Text>
+    <View style={[styles.container, scaledStyles.container]}>
+      <Animated.View style={[styles.speechBubble, bubbleBorderStyle, scaledStyles.speechBubble]}>
+        <Text style={[styles.speechText, scaledStyles.speechText]}>{speechText}</Text>
+        {character.status === 'FULFILLED' && (
+          <View style={[styles.fulfilledBadge, scaledStyles.fulfilledBadge]}>
+            <Text style={[styles.fulfilledText, scaledStyles.fulfilledText]}>✓</Text>
+          </View>
+        )}
       </Animated.View>
-      <View style={styles.bubbleTail} />
+      <View style={[styles.bubbleTail, scaledStyles.bubbleTail]} />
       <Animated.View style={bobStyle}>
-        <CharacterAvatar type={character.type} mood={currentMood} variant={variant} />
+        <CharacterAvatar type={character.type} mood={currentMood} variant={variant} size={avatarSize} />
       </Animated.View>
-      <View style={styles.timerBarTrack}>
+      <View style={[styles.timerBarTrack, scaledStyles.timerBarTrack]}>
         <Animated.View style={[styles.timerBarFill, timerBarStyle]} />
       </View>
     </View>
@@ -184,16 +242,9 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 6,
-    width: 96,
   },
   speechBubble: {
     backgroundColor: THEME.colors.offWhite,
-    borderRadius: 10,
-    borderWidth: 2.5,
-    paddingHorizontal: 6,
-    paddingVertical: 4,
-    maxWidth: 96,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -201,29 +252,38 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   speechText: {
-    fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#333',
   },
+  fulfilledBadge: {
+    position: 'absolute',
+    right: -6,
+    top: -8,
+    backgroundColor: THEME.colors.green,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
+  },
+  fulfilledText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
   bubbleTail: {
     width: 0,
     height: 0,
-    borderLeftWidth: 5,
-    borderRightWidth: 5,
-    borderTopWidth: 6,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
     borderTopColor: THEME.colors.offWhite,
     marginTop: -1,
   },
   timerBarTrack: {
-    width: 64,
-    height: 6,
     backgroundColor: 'rgba(0,0,0,0.15)',
     borderRadius: 3,
     overflow: 'hidden',
-    marginTop: 4,
   },
   timerBarFill: {
     height: '100%',

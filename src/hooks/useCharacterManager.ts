@@ -47,6 +47,7 @@ export const useCharacterManager = () => {
       type: randomType,
       need: randomNeed,
       timer: currentTimer,
+      status: 'ACTIVE',
     };
 
     addCharacter(newCharacter);

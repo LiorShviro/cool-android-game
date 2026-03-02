@@ -36,5 +36,9 @@ describe('Storage Service', () => {
     expect(scores[1].score).toBe(100);
     expect(scores[2].score).toBe(50);
   });
-});
 
+  it('should save and retrieve player name', () => {
+    storageService.setPlayerName('Lior');
+    expect(storageService.getPlayerName()).toBe('Lior');
+  });
+});

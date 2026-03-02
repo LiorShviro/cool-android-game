@@ -13,7 +13,20 @@ describe('Game Store', () => {
     expect(state.lives).toBe(3);
     expect(state.score).toBe(0);
     expect(state.comboStreak).toBe(0);
+    expect(state.maxCombo).toBe(0);
     expect(state.isPaused).toBe(false);
+    expect(state.pausedScreen).toBe('NONE');
+    expect(state.playerName).toBe('Guest');
+    expect(state.needsFulfilled).toBe(0);
+    expect(state.needsFulfilledByNeed).toEqual({
+      WATER: 0,
+      BAMBA: 0,
+      BISLI: 0,
+      PET: 0,
+      CHARGING: 0,
+      RECEPTION: 0,
+    });
+    expect(state.missedNeeds).toBe(0);
   });
 
   it('should update game state correctly', () => {
@@ -37,6 +50,7 @@ describe('Game Store', () => {
     decrementLives();
     expect(useGameStore.getState().lives).toBe(0);
     expect(useGameStore.getState().gameState).toBe(GameState.GAME_OVER);
+    expect(useGameStore.getState().missedNeeds).toBe(3);
   });
 
   it('should toggle pause', () => {
@@ -52,7 +66,10 @@ describe('Game Store', () => {
     const character = { id: '1', type: 'ADULT', need: 'WATER', timer: 15000 };
     
     addCharacter(character as any);
-    expect(useGameStore.getState().activeCharacters).toContainEqual(character);
+    expect(useGameStore.getState().activeCharacters).toContainEqual({
+      ...character,
+      status: 'ACTIVE',
+    });
     
     removeCharacter('1');
     expect(useGameStore.getState().activeCharacters).toEqual([]);
@@ -65,6 +82,9 @@ describe('Game Store', () => {
     fulfillNeed('WATER');
     expect(useGameStore.getState().score).toBeGreaterThan(0);
     expect(useGameStore.getState().comboStreak).toBe(1);
+    expect(useGameStore.getState().needsFulfilled).toBe(1);
+    expect(useGameStore.getState().activeCharacters[0].status).toBe('FULFILLED');
+    expect(useGameStore.getState().needsFulfilledByNeed.WATER).toBe(1);
   });
 
   it('should reset combo streak on character removal (timer expiration)', () => {
@@ -75,7 +95,15 @@ describe('Game Store', () => {
     fulfillNeed('WATER');
     expect(useGameStore.getState().comboStreak).toBe(1);
     
-    removeCharacter('2');
+    removeCharacter('2', 'EXPIRED');
     expect(useGameStore.getState().comboStreak).toBe(0);
+  });
+
+  it('should start a new run and set runStartedAt', () => {
+    const { startNewRun } = useGameStore.getState();
+    startNewRun();
+    const state = useGameStore.getState();
+    expect(state.gameState).toBe(GameState.PLAYING);
+    expect(state.runStartedAt).not.toBeNull();
   });
 });
