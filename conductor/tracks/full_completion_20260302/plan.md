@@ -7,10 +7,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Reception Hunter (Sweet Spot)
-- [ ] Task: Write tests for `ReceptionHunter` (mocking gestures and hold logic).
-- [ ] Task: Implement the `ReceptionHunter` component using `GestureDetector` and Reanimated.
-- [ ] Task: Integrate `ReceptionHunter` into `App.tsx` and link to "RECEPTION" need.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Write tests for `ReceptionHunter` (mocking gestures and hold logic).
+- [x] Task: Implement the `ReceptionHunter` component using `GestureDetector` and Reanimated. (Commit: already implemented)
+- [x] Task: Integrate `ReceptionHunter` into `App.tsx` and link to "RECEPTION" need. (Commit: manual integration)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+
 
 ## Phase 3: Finalizing Tutorial & Leaderboard
 - [ ] Task: Replace `TutorialScreen` placeholder content with detailed station guides.
