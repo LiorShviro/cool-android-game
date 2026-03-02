@@ -47,7 +47,11 @@ Each station requires a different touch gesture, forcing the player to constantl
 *   **Combos:** Visual multipliers (x2, x3) for consecutive mistake-free fulfillments.
 *   **Lives:** 3 Rockets. A rocket is lost when a character timer expires.
 *   **End Game:** Endless survival mode. Progressively faster. Ends when lives reach 0 or 100% stress.
-*   **Leaderboard:** Local Top 10 with ranks (e.g., "Mamad Rookie," "Chief of Home Front").
+*   **Leaderboard:** Local Top 10 with score-based ranks:
+    - 0-500: Mamad Rookie
+    - 501-1500: Snack Commander
+    - 1501-3000: Safe Room Pro
+    - 3001+: Chief of Home Front
 
 ### 5. Settings & Accessibility
 *   **Master Mute:** Giant button for instant silence.
