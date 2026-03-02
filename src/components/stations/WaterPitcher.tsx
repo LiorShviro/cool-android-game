@@ -8,6 +8,8 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { hapticService } from '../../services/hapticService';
+import { CupSvg } from '../../assets/svg/stations/CupSvg';
+import { THEME } from '../../assets/theme';
 
 interface WaterPitcherProps {
   onSuccess: () => void;
@@ -20,15 +22,12 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
 
   const handlePressIn = () => {
     if (isLocked) return;
-    
+
     hapticService.light();
     fillProgress.value = 0;
     fillProgress.value = withTiming(
-      1.5, // Allow overfilling up to 150%
-      {
-        duration: 3000, // 2s for 100%, 3s for 150%
-        easing: Easing.linear,
-      }
+      1.5,
+      { duration: 3000, easing: Easing.linear }
     );
   };
 
@@ -46,7 +45,6 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
       hapticService.error();
       triggerLock();
     } else {
-      // Too early - just reset
       hapticService.warning();
       fillProgress.value = withTiming(0, { duration: 300 });
     }
@@ -55,32 +53,29 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const triggerLock = () => {
     setIsLocked(true);
     if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
-    
     lockTimerRef.current = setTimeout(() => {
       setIsLocked(false);
       fillProgress.value = 0;
     }, 1500);
   };
 
-  const animatedWaterStyle = useAnimatedStyle(() => {
-    return {
-      height: `${Math.min(100, fillProgress.value * 100)}%`,
-      backgroundColor: fillProgress.value > 1.2 ? '#FF4444' : '#33b5e5',
-    };
-  });
-
   return (
     <View style={styles.container}>
-      <View style={styles.pitcherContainer}>
-        <View style={styles.cup}>
-          <Animated.View style={[styles.water, animatedWaterStyle]} />
-          {isLocked && (
-            <View style={styles.lockOverlay}>
-              <Text style={styles.lockText}>LOCKED</Text>
-            </View>
-          )}
-        </View>
+      {/* Station label shelf */}
+      <View style={styles.shelfTop}>
+        <Text style={styles.stationLabel}>WATER</Text>
       </View>
+
+      {/* Cup visual */}
+      <View style={styles.cupWrapper}>
+        <CupSvg fillProgress={fillProgress} isOverfilled={isLocked} />
+        {isLocked && (
+          <View style={styles.lockOverlay}>
+            <Text style={styles.lockText}>LOCKED</Text>
+          </View>
+        )}
+      </View>
+
       <Pressable
         testID="water-pitcher-pressable"
         onPressIn={handlePressIn}
@@ -92,7 +87,7 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
         ]}
         disabled={isLocked}
       >
-        <Text style={styles.buttonText}>{isLocked ? 'WIPING...' : 'WATER'}</Text>
+        <Text style={styles.buttonText}>{isLocked ? 'WIPING...' : 'POUR'}</Text>
       </Pressable>
     </View>
   );
@@ -101,51 +96,62 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 10,
+    margin: 8,
+    backgroundColor: THEME.colors.cream,
+    borderRadius: THEME.borderRadius.medium,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+    paddingBottom: 10,
+    minWidth: 110,
   },
-  pitcherContainer: {
-    width: 80,
-    height: 100,
-    justifyContent: 'flex-end',
-    marginBottom: 10,
-  },
-  cup: {
-    width: 60,
-    height: 80,
-    borderWidth: 3,
-    borderColor: '#333',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#FFF',
-    justifyContent: 'flex-end',
-    alignSelf: 'center',
-  },
-  water: {
+  shelfTop: {
     width: '100%',
-    position: 'absolute',
-    bottom: 0,
+    backgroundColor: THEME.colors.woodLight,
+    borderTopLeftRadius: THEME.borderRadius.medium - 2,
+    borderTopRightRadius: THEME.borderRadius.medium - 2,
+    paddingVertical: 5,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: THEME.colors.outline,
+  },
+  stationLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
+  },
+  cupWrapper: {
+    marginVertical: 8,
+    position: 'relative',
   },
   lockOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 68, 68, 0.4)',
+    backgroundColor: 'rgba(255, 68, 68, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 6,
   },
   lockText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 11,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   button: {
-    backgroundColor: '#33b5e5',
-    padding: 15,
-    borderRadius: 30,
-    minWidth: 100,
+    backgroundColor: THEME.colors.blue,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: THEME.borderRadius.pill,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
     alignItems: 'center',
   },
   buttonPressed: {
-    backgroundColor: '#0099cc',
+    backgroundColor: THEME.colors.blueDark,
     transform: [{ scale: 0.95 }],
   },
   buttonLocked: {
@@ -154,5 +160,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 11,
   },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useGameStore } from '../store/gameStore';
+import { RocketSvg } from '../assets/svg/ui/RocketSvg';
 
 export const RocketHUD: React.FC = () => {
   const { lives } = useGameStore();
@@ -8,9 +9,9 @@ export const RocketHUD: React.FC = () => {
   return (
     <View style={styles.container}>
       {[...Array(3)].map((_, i) => (
-        <Text key={i} style={[styles.rocket, i >= lives && styles.lost]}>
-          🚀
-        </Text>
+        <View key={i} style={styles.rocketWrapper}>
+          <RocketSvg active={i < lives} size={22} />
+        </View>
       ))}
     </View>
   );
@@ -19,13 +20,10 @@ export const RocketHUD: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    padding: 5,
+    alignItems: 'center',
+    padding: 4,
   },
-  rocket: {
-    fontSize: 24,
-    marginHorizontal: 2,
-  },
-  lost: {
-    opacity: 0.2,
+  rocketWrapper: {
+    marginHorizontal: 3,
   },
 });

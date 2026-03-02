@@ -60,7 +60,9 @@ jest.mock('react-native-reanimated', () => {
     withTiming: jest.fn(handleWithTiming),
     cancelAnimation: jest.fn(),
     interpolateColor: jest.fn(() => 'green'),
-    Easing: { linear: jest.fn((t) => t), out: (cb) => cb, in: (cb) => cb, quad: (t) => t },
+    Easing: { linear: jest.fn((t) => t), out: (cb) => cb, in: (cb) => cb, inOut: (cb) => cb, quad: (t) => t, sin: (t) => t, ease: (t) => t },
+    createAnimatedComponent: jest.fn((Component) => Component),
+    useAnimatedProps: jest.fn(() => ({})),
     runOnJS: jest.fn((fn) => fn),
     withRepeat: jest.fn((val) => val),
     withSequence: jest.fn((...vals) => vals[0]),
@@ -70,6 +72,7 @@ jest.mock('react-native-reanimated', () => {
     default: {
       View: View,
       Text: Text,
+      createAnimatedComponent: jest.fn((Component) => Component),
     },
     View: View,
     Text: Text,

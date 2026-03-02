@@ -8,15 +8,49 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
+import Svg, { Rect, Path, Circle, G } from 'react-native-svg';
+import { THEME } from '../../assets/theme';
 
 interface ReceptionHunterProps {
   onSuccess: () => void;
 }
 
 const randomSweetSpot = () => Math.random() * 120 - 60;
-
-const HOLD_TICKS_REQUIRED = 20; // 20 * 50ms = 1s
+const HOLD_TICKS_REQUIRED = 20;
 const TICK_MS = 50;
+
+const HandWithPhoneSvg: React.FC<{ bars: number }> = ({ bars }) => (
+  <Svg width={44} height={50} viewBox="0 0 44 50">
+    {/* Phone */}
+    <Rect x={14} y={0} width={20} height={30} rx={3} fill="#222" stroke={THEME.colors.outline} strokeWidth={1.5} />
+    <Rect x={16} y={3} width={16} height={20} rx={1} fill="#4A90D9" />
+    {/* Signal bars on phone screen */}
+    {[1, 2, 3].map((n) => (
+      <Rect
+        key={n}
+        x={16 + (n - 1) * 5}
+        y={13 - n * 2}
+        width={4}
+        height={n * 2 + 2}
+        rx={1}
+        fill={bars >= n ? '#00FF88' : '#555'}
+      />
+    ))}
+    <Circle cx={24} cy={27} r={1.5} fill="#555" />
+    {/* Hand */}
+    <Path
+      d="M 10 28 Q 6 30 6 40 L 38 40 Q 38 30 34 28 Z"
+      fill={THEME.colors.skin}
+      stroke={THEME.colors.outline}
+      strokeWidth={2}
+    />
+    {/* Fingers */}
+    <Rect x={8} y={38} width={6} height={12} rx={3} fill={THEME.colors.skin} stroke={THEME.colors.outline} strokeWidth={1.5} />
+    <Rect x={16} y={36} width={6} height={14} rx={3} fill={THEME.colors.skin} stroke={THEME.colors.outline} strokeWidth={1.5} />
+    <Rect x={24} y={36} width={6} height={14} rx={3} fill={THEME.colors.skin} stroke={THEME.colors.outline} strokeWidth={1.5} />
+    <Rect x={32} y={38} width={6} height={12} rx={3} fill={THEME.colors.skin} stroke={THEME.colors.outline} strokeWidth={1.5} />
+  </Svg>
+);
 
 export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) => {
   const sweetSpotX = useRef(randomSweetSpot());
@@ -64,12 +98,8 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
     else if (dist < 45) newBars = 2;
     else if (dist < 65) newBars = 1;
     setBars(newBars);
-
-    if (newBars === 3) {
-      startHoldTimer();
-    } else {
-      stopHoldTimer();
-    }
+    if (newBars === 3) startHoldTimer();
+    else stopHoldTimer();
   };
 
   const resetPosition = () => {
@@ -100,33 +130,39 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
 
   return (
     <View style={styles.container}>
+      <View style={styles.shelfTop}>
+        <Text style={styles.stationLabel}>RECEPTION</Text>
+      </View>
+
       <View style={styles.track}>
-        <View style={styles.signalBars}>
+        {/* Signal bars display */}
+        <View style={styles.signalDisplay}>
           {[1, 2, 3].map((n) => (
             <View
               key={n}
               style={[
                 styles.bar,
-                { height: 8 + n * 6 },
+                { height: 8 + n * 7 },
                 bars >= n ? styles.barActive : styles.barInactive,
               ]}
             />
           ))}
         </View>
+
+        {/* Hold progress bar */}
+        <View style={styles.holdBarContainer}>
+          <View style={[styles.holdBarFill, { width: `${Math.round(holdProgress * 100)}%` }]} />
+        </View>
+
+        {/* Hand with phone */}
         <View style={styles.handTrack}>
           <GestureDetector gesture={panGesture}>
             <Animated.View style={[styles.hand, handAnimStyle]} testID="reception-hand">
-              <Text style={styles.handIcon}>✋</Text>
+              <HandWithPhoneSvg bars={bars} />
             </Animated.View>
           </GestureDetector>
         </View>
-        <View style={styles.holdBarContainer}>
-          <View
-            style={[styles.holdBarFill, { width: `${Math.round(holdProgress * 100)}%` }]}
-          />
-        </View>
       </View>
-      <Text style={styles.title}>RECEPTION</Text>
     </View>
   );
 };
@@ -134,65 +170,84 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    margin: 10,
+    margin: 8,
+    backgroundColor: THEME.colors.cream,
+    borderRadius: THEME.borderRadius.medium,
+    borderWidth: 2.5,
+    borderColor: THEME.colors.outline,
+    paddingBottom: 10,
+    minWidth: 110,
+  },
+  shelfTop: {
+    width: '100%',
+    backgroundColor: THEME.colors.woodLight,
+    borderTopLeftRadius: THEME.borderRadius.medium - 2,
+    borderTopRightRadius: THEME.borderRadius.medium - 2,
+    paddingVertical: 5,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: THEME.colors.outline,
+  },
+  stationLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: 'white',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
   },
   track: {
     width: 100,
     height: 140,
-    backgroundColor: '#E8F5E9',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#A5D6A7',
+    backgroundColor: '#E8F5E8',
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: THEME.colors.outline,
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingVertical: 10,
+    marginTop: 8,
   },
-  signalBars: {
+  signalDisplay: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 4,
-    height: 30,
+    gap: 5,
+    height: 36,
   },
   bar: {
-    width: 10,
-    borderRadius: 2,
+    width: 12,
+    borderRadius: 3,
   },
   barActive: {
-    backgroundColor: '#00C851',
+    backgroundColor: THEME.colors.green,
   },
   barInactive: {
     backgroundColor: '#CCC',
   },
+  holdBarContainer: {
+    width: 80,
+    height: 8,
+    backgroundColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 4,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: THEME.colors.outline,
+  },
+  holdBarFill: {
+    height: '100%',
+    backgroundColor: THEME.colors.green,
+    borderRadius: 4,
+  },
   handTrack: {
     width: 80,
-    height: 40,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
   },
   hand: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  handIcon: {
-    fontSize: 22,
-  },
-  holdBarContainer: {
-    width: 80,
-    height: 8,
-    backgroundColor: '#CCC',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  holdBarFill: {
-    height: '100%',
-    backgroundColor: '#00C851',
-    borderRadius: 4,
-  },
-  title: {
-    marginTop: 8,
-    fontWeight: 'bold',
-    fontSize: 12,
   },
 });

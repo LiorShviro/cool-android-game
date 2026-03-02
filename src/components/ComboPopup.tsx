@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSequence,
   withTiming,
   withSpring,
-  runOnJS,
 } from 'react-native-reanimated';
+import { StarburstSvg } from '../assets/svg/ui/StarburstSvg';
 
 interface ComboPopupProps {
   multiplier: number;
@@ -20,7 +20,7 @@ export const ComboPopup: React.FC<ComboPopupProps> = ({ multiplier }) => {
   useEffect(() => {
     if (multiplier > 1) {
       scale.value = withSequence(
-        withSpring(1.5),
+        withSpring(1.4),
         withTiming(1, { duration: 200 }),
         withTiming(1, { duration: 1000 }),
         withTiming(0, { duration: 300 })
@@ -40,9 +40,16 @@ export const ComboPopup: React.FC<ComboPopupProps> = ({ multiplier }) => {
 
   if (multiplier <= 1) return null;
 
+  const starColor = multiplier >= 3 ? '#FF6030' : '#F5C842';
+
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <Text style={styles.text}>x{multiplier} COMBO!</Text>
+      <View style={styles.starburstWrapper}>
+        <StarburstSvg size={130} color={starColor} rays={10} />
+      </View>
+      <View style={styles.textWrapper}>
+        <Text style={styles.multiplierText}>x{multiplier} COMBO!</Text>
+      </View>
     </Animated.View>
   );
 };
@@ -50,21 +57,34 @@ export const ComboPopup: React.FC<ComboPopupProps> = ({ multiplier }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: '30%',
+    top: '28%',
     alignSelf: 'center',
-    backgroundColor: 'rgba(255, 187, 51, 0.9)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
     zIndex: 100,
     elevation: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  text: {
+  starburstWrapper: {
+    position: 'absolute',
+  },
+  textWrapper: {
+    alignItems: 'center',
+  },
+  comboLabel: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 13,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0,0,0,0.6)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+  },
+  multiplierText: {
+    color: 'white',
+    fontSize: 32,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.6)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 3,
   },
 });

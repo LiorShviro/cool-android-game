@@ -13,6 +13,16 @@ export const CHARACTER_EMOJIS: Record<string, string[]> = {
   DOG: ['🐕'],
 };
 
+// SVG visual variants per character type
+// ADULT alternates between SABA (grandpa) and PARENT based on character id
+// KID always renders TEEN
+// DOG always renders DOG
+export const CHARACTER_VARIANTS: Record<string, string[]> = {
+  ADULT: ['SABA', 'PARENT'],
+  KID: ['TEEN'],
+  DOG: ['DOG'],
+};
+
 export const CHARACTER_CONFIG = {
   ADULT: {
     types: ['ADULT'] as const,
