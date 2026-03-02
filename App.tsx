@@ -14,6 +14,7 @@ import { GameHUD } from './src/components/GameHUD';
 import { WaterPitcher } from './src/components/stations/WaterPitcher';
 import { SnackSorter } from './src/components/stations/SnackSorter';
 import { DogDistraction } from './src/components/stations/DogDistraction';
+import { ChargingStation } from './src/components/stations/ChargingStation';
 import { PauseMenu } from './src/components/PauseMenu';
 import { ComboPopup } from './src/components/ComboPopup';
 import { storageService, LeaderboardEntry } from './src/services/storageService';
@@ -149,6 +150,7 @@ const App = () => {
             <WaterPitcher onSuccess={() => fulfillNeed('WATER')} />
             <SnackSorter onSuccess={(snack) => fulfillNeed(snack)} />
             <DogDistraction onSuccess={() => fulfillNeed('PET')} />
+            <ChargingStation onSuccess={() => fulfillNeed('CHARGING')} />
           </ScrollView>
         </View>
       </SafeAreaView>
