@@ -1,6 +1,13 @@
 import { MMKV } from 'react-native-mmkv';
 
-const storage = new MMKV();
+let storage: MMKV | null = null;
+
+const getStorage = (): MMKV => {
+  if (!storage) {
+    storage = new MMKV();
+  }
+  return storage;
+};
 
 export interface LeaderboardEntry {
   name: string;
@@ -24,11 +31,11 @@ export const storageService = {
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
     
-    storage.set(LEADERBOARD_KEY, JSON.stringify(newLeaderboard));
+    getStorage().set(LEADERBOARD_KEY, JSON.stringify(newLeaderboard));
   },
 
   getLeaderboard: (): LeaderboardEntry[] => {
-    const data = storage.getString(LEADERBOARD_KEY);
+    const data = getStorage().getString(LEADERBOARD_KEY);
     if (!data) return [];
     try {
       return JSON.parse(data);
@@ -38,6 +45,6 @@ export const storageService = {
   },
 
   clearLeaderboard: () => {
-    storage.delete(LEADERBOARD_KEY);
+    getStorage().delete(LEADERBOARD_KEY);
   },
 };
