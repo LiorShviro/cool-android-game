@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -37,6 +37,8 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   const { decrementLives, removeCharacter, isPaused } = useGameStore();
   const progress = useSharedValue(1);
   const bobY = useSharedValue(0);
+  const isMounted = useSharedValue(true);
+  const lastMood = useSharedValue<Mood>('neutral');
   const isInitialMount = useRef(true);
 
   // Deterministic visual variant per character
@@ -45,7 +47,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     return num;
   }, [character.id]);
 
-  const startBobAnimation = (durationMs: number) => {
+  const startBobAnimation = useCallback((durationMs: number) => {
     bobY.value = withRepeat(
       withSequence(
         withTiming(-6, { duration: durationMs, easing: Easing.inOut(Easing.sin) }),
@@ -54,11 +56,19 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
       -1,
       true
     );
-  };
+  }, [bobY]);
 
   useEffect(() => {
     startBobAnimation(600);
-  }, []);
+  }, [startBobAnimation]);
+
+  useEffect(() => {
+    return () => {
+      isMounted.value = false;
+      cancelAnimation(progress);
+      cancelAnimation(bobY);
+    };
+  }, [bobY, isMounted, progress]);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -67,7 +77,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         0,
         { duration: character.timer, easing: Easing.linear },
         (finished) => {
-          if (finished) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
         }
       );
       return;
@@ -82,17 +92,18 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         0,
         { duration: remaining, easing: Easing.linear },
         (finished) => {
-          if (finished) runOnJS(handleTimerExpire)();
+          if (finished && isMounted.value) runOnJS(handleTimerExpire)();
         }
       );
       startBobAnimation(600);
     }
-  }, [isPaused]);
+  }, [character.timer, isMounted, isPaused, progress, startBobAnimation]);
 
   // Speed up bob when urgent
   useAnimatedReaction(
     () => progress.value,
     (current, previous) => {
+      if (!isMounted.value) return;
       if (current < 0.2 && previous && previous >= 0.2) {
         runOnJS(hapticService.warning)();
         runOnJS(startBobAnimation)(200);
@@ -102,11 +113,11 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     }
   );
 
-  const handleTimerExpire = () => {
+  const handleTimerExpire = useCallback(() => {
     hapticService.error();
     decrementLives();
     removeCharacter(character.id);
-  };
+  }, [character.id, decrementLives, removeCharacter]);
 
   const timerBarStyle = useAnimatedStyle(() => {
     const color = interpolateColor(
@@ -139,24 +150,16 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     return 'neutral';
   }, [character.id]);
 
-  // Track mood reactively via a separate shared value we expose as state
-  const moodState = useRef<Mood>('neutral');
-  useAnimatedReaction(
-    () => progress.value,
-    (current) => {
-      const newMood: Mood = current <= 0.2 ? 'urgent' : current <= 0.5 ? 'impatient' : 'neutral';
-      if (newMood !== moodState.current) {
-        runOnJS((m: Mood) => { moodState.current = m; })(newMood);
-      }
-    }
-  );
-
   const [currentMood, setCurrentMood] = React.useState<Mood>('neutral');
   useAnimatedReaction(
     () => progress.value,
     (current) => {
+      if (!isMounted.value) return;
       const newMood: Mood = current <= 0.2 ? 'urgent' : current <= 0.5 ? 'impatient' : 'neutral';
-      runOnJS(setCurrentMood)(newMood);
+      if (newMood !== lastMood.value) {
+        lastMood.value = newMood;
+        runOnJS(setCurrentMood)(newMood);
+      }
     }
   );
 
