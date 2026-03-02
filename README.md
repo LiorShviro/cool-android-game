@@ -2,6 +2,17 @@
 
 **Mamad Manager** is a fast-paced, 2D reflex and time-management game built with React Native. You take on the role of a safe room manager in Israel, juggling the needs of stressed adults, bored kids, and an energetic dog while the siren sounds.
 
+## 🔓 Public vs Internal
+This repository uses a dual-branch setup:
+- `main` — internal/dev branch (includes planning docs).
+- `public` — sanitized public branch.
+
+To publish updates, run:
+```bash
+./scripts/export-public.sh --push
+```
+This script removes internal-only files, swaps in `README.public.md`, and updates the `public` branch.
+
 ## 🚀 Premise
 The siren has sounded, the heavy iron door is shut, and now you have to keep everyone inside calm until the Home Front Command gives the all-clear. If the room's overall "Stress Meter" maxes out, it's Game Over!
 
@@ -55,6 +66,18 @@ We use Jest and React Native Testing Library for robust logic and component veri
 ```bash
 npm test
 ```
+
+## 🎨 UI Customization
+See `UI_MANUAL.md` for where to adjust characters, backgrounds, station sizes, and theme tokens.
+
+## 🤝 Contributing
+See `CONTRIBUTING.md`.
+
+## 🔒 Security
+See `SECURITY.md`.
+
+## 🧭 GitHub Publication
+See `docs/github-publication.md` for recommended GitHub settings when publishing.
 
 ## 🤖 CI/CD
 This project uses **GitHub Actions** to automatically build and version Android APKs on every push to `main`.
