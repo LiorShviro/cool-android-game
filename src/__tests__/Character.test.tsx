@@ -19,6 +19,7 @@ describe('Character Component', () => {
     (useGameStore as any).mockReturnValue({
       removeCharacter: mockRemoveCharacter,
       decrementLives: mockDecrementLives,
+      isPaused: false,
     });
   });
 

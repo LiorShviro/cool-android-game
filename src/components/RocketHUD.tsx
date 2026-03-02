@@ -27,6 +27,5 @@ const styles = StyleSheet.create({
   },
   lost: {
     opacity: 0.2,
-    grayscale: 1, // Doesn't work in RN but opacity helps
   },
 });

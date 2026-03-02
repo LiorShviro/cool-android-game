@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../store/gameStore';
-import { OverallStressMeter } from './OverallStressMeter';
 import { RocketHUD } from './RocketHUD';
 
 export const GameHUD: React.FC = () => {
@@ -26,7 +25,6 @@ export const GameHUD: React.FC = () => {
           <Text style={styles.pauseIcon}>â˘â˘</Text>
         </TouchableOpacity>
       </View>
-      <OverallStressMeter />
     </View>
   );
 };

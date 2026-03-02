@@ -3,11 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { useGameStore, GameState } from '../store/gameStore';
 
 export const PauseMenu: React.FC = () => {
-  const { isPaused, togglePause, setGameState } = useGameStore();
+  const { isPaused, togglePause, setGameState, reset } = useGameStore();
 
   const handleQuit = () => {
+    reset();
     setGameState(GameState.START);
-    togglePause();
   };
 
   return (

@@ -86,15 +86,27 @@ const App = () => {
     }
 
     if (gameState === GameState.GAME_OVER) {
+      const leaderboardPosition = leaderboard.findIndex((e) => e.score === score) + 1;
+      const positionText = leaderboardPosition > 0 ? `#${leaderboardPosition} on leaderboard` : '';
+
       return (
         <SafeAreaView style={styles.fullScreen}>
           <View style={styles.centered}>
+            <Text style={styles.gameOverEmoji}>🚀💨</Text>
             <Text style={[styles.title, { color: '#FF4444' }]}>GAME OVER</Text>
+            <Text style={styles.gameOverFlavor}>All rockets lost!</Text>
             <Text style={styles.finalScore}>Final Score: {score}</Text>
-            <Text style={styles.rankText}>Rank: {storageService.getRank(score)}</Text>
-            
+            <Text style={styles.rankText}>{storageService.getRank(score)}</Text>
+            {positionText !== '' && (
+              <Text style={styles.positionText}>{positionText}</Text>
+            )}
+
             <TouchableOpacity style={styles.mainButton} onPress={startGame}>
               <Text style={styles.buttonText}>TRY AGAIN</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.secondaryButton} onPress={() => setGameState(GameState.LEADERBOARD)}>
+              <Text style={styles.secondaryButtonText}>LEADERBOARD</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.secondaryButton} onPress={() => setGameState(GameState.START)}>
@@ -210,6 +222,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  gameOverEmoji: {
+    fontSize: 48,
+    marginBottom: 5,
+  },
+  gameOverFlavor: {
+    fontSize: 16,
+    color: '#FF4444',
+    marginBottom: 10,
+  },
   finalScore: {
     fontSize: 24,
     marginBottom: 5,
@@ -218,7 +239,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#00C851',
-    marginBottom: 30,
+    marginBottom: 5,
+  },
+  positionText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 25,
   },
   header: {
     height: 80,

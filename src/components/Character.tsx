@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -21,25 +21,32 @@ interface CharacterProps {
 export const Character: React.FC<CharacterProps> = ({ character }) => {
   const { decrementLives, removeCharacter, isPaused } = useGameStore();
   const progress = useSharedValue(1);
-  const pausedProgress = useSharedValue(1);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (!isPaused) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       progress.value = withTiming(
         0,
-        {
-          duration: character.timer * pausedProgress.value,
-          easing: Easing.linear,
-        },
+        { duration: character.timer, easing: Easing.linear },
         (finished) => {
-          if (finished) {
-            runOnJS(handleTimerExpire)();
-          }
+          if (finished) runOnJS(handleTimerExpire)();
         }
       );
-    } else {
-      pausedProgress.value = progress.value;
+      return;
+    }
+
+    if (isPaused) {
       cancelAnimation(progress);
+    } else {
+      const remaining = progress.value * character.timer;
+      progress.value = withTiming(
+        0,
+        { duration: remaining, easing: Easing.linear },
+        (finished) => {
+          if (finished) runOnJS(handleTimerExpire)();
+        }
+      );
     }
   }, [isPaused]);
 

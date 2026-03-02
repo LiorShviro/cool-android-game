@@ -18,7 +18,7 @@ export const TutorialScreen: React.FC<TutorialScreenProps> = ({ onBack }) => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>💧 Water Pitcher</Text>
-          <Text style={styles.text}>Press and hold the button to pour water. Release it when the cup is 80-100% full. Don't overfill, or the station will lock!</Text>
+          <Text style={styles.text}>Press and hold the button to pour water. Release it when the cup is 65-120% full. Don't overfill, or the station will lock!</Text>
         </View>
 
         <View style={styles.section}>
@@ -28,7 +28,7 @@ export const TutorialScreen: React.FC<TutorialScreenProps> = ({ onBack }) => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🎾 Dog Distraction</Text>
-          <Text style={styles.text}>The dog is barking! Tap the bouncing tennis ball 4 times quickly to throw it and quiet the dog.</Text>
+          <Text style={styles.text}>The dog is barking! Tap the bouncing tennis ball 3 times quickly to throw it and quiet the dog.</Text>
         </View>
 
         <View style={styles.section}>

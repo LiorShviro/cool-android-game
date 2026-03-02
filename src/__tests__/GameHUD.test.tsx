@@ -11,9 +11,6 @@ jest.mock('../store/gameStore', () => {
 });
 
 // Mock sub-components
-jest.mock('../components/OverallStressMeter', () => ({
-  OverallStressMeter: () => null,
-}));
 jest.mock('../components/RocketHUD', () => ({
   RocketHUD: () => null,
 }));

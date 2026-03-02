@@ -19,11 +19,14 @@ describe('PauseMenu', () => {
   const mockTogglePause = jest.fn();
   const mockSetGameState = jest.fn();
 
+  const mockReset = jest.fn();
+
   beforeEach(() => {
     (useGameStore as any).mockReturnValue({
       isPaused: true,
       togglePause: mockTogglePause,
       setGameState: mockSetGameState,
+      reset: mockReset,
     });
   });
 
@@ -40,10 +43,10 @@ describe('PauseMenu', () => {
     expect(mockTogglePause).toHaveBeenCalled();
   });
 
-  it('calls setGameState and togglePause when quit is pressed', () => {
+  it('calls reset and setGameState when quit is pressed', () => {
     const { getByText } = render(<PauseMenu />);
     fireEvent.press(getByText('QUIT TO MENU'));
+    expect(mockReset).toHaveBeenCalled();
     expect(mockSetGameState).toHaveBeenCalledWith('START');
-    expect(mockTogglePause).toHaveBeenCalled();
   });
 });
