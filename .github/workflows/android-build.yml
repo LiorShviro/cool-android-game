@@ -25,6 +25,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        # Using npm install instead of ci because of lockfile sync issues
         run: npm install --silent
 
       - name: Setup Gradle
