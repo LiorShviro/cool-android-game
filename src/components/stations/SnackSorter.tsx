@@ -1,9 +1,9 @@
 import React, { useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, PanResponder, Animated } from 'react-native';
+import { View, Text, StyleSheet, PanResponder, Animated, Image } from 'react-native';
 import { hapticService } from '../../services/hapticService';
-import { SnackBagSvg } from '../../assets/svg/stations/SnackBagSvg';
 import { THEME } from '../../assets/theme';
 import { useUIScale } from '../../hooks/useUIScale';
+import { STATION_PNGS } from '../../assets/png/stations';
 
 interface SnackSorterProps {
   onSuccess: (snack: 'BAMBA' | 'BISLI') => void;
@@ -12,41 +12,42 @@ interface SnackSorterProps {
 export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
   const pan = useRef(new Animated.ValueXY()).current;
   const { scale } = useUIScale();
-  const swipeThreshold = 30 * scale;
+  const stationScale = scale * 1.35;
+  const swipeThreshold = 30 * stationScale;
   const scaledStyles = useMemo(
     () => ({
       container: {
-        minWidth: Math.round(230 * scale),
-        margin: Math.round(8 * scale),
-        paddingBottom: Math.round(12 * scale),
+        minWidth: Math.round(230 * stationScale),
+        margin: Math.round(8 * stationScale),
+        paddingBottom: Math.round(12 * stationScale),
       },
       shelfTop: {
-        paddingVertical: Math.round(6 * scale),
+        paddingVertical: Math.round(6 * stationScale),
       },
       stationLabel: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       sorterArea: {
-        width: Math.round(230 * scale),
-        height: Math.round(115 * scale),
-        marginTop: Math.round(6 * scale),
-        paddingHorizontal: Math.round(10 * scale),
+        width: Math.round(230 * stationScale),
+        height: Math.round(115 * stationScale),
+        marginTop: Math.round(6 * stationScale),
+        paddingHorizontal: Math.round(10 * stationScale),
       },
       sideLabel: {
-        width: Math.round(50 * scale),
+        width: Math.round(50 * stationScale),
       },
       sideLabelText: {
-        fontSize: Math.max(9, Math.round(10 * scale)),
+        fontSize: Math.max(9, Math.round(10 * stationScale)),
       },
       arrowText: {
-        fontSize: Math.max(14, Math.round(16 * scale)),
+        fontSize: Math.max(14, Math.round(16 * stationScale)),
       },
       snackSize: {
-        width: Math.round(60 * scale),
-        height: Math.round(80 * scale),
+        width: Math.round(60 * stationScale),
+        height: Math.round(80 * stationScale),
       },
     }),
-    [scale]
+    [stationScale]
   );
 
   const panResponder = useRef(
@@ -96,7 +97,7 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
           ]}
           {...panResponder.panHandlers}
         >
-          <SnackBagSvg type="SNACK" width={scaledStyles.snackSize.width} height={scaledStyles.snackSize.height} />
+          <Image source={STATION_PNGS.snackBag} style={scaledStyles.snackSize} resizeMode="contain" />
         </Animated.View>
 
         {/* Right label */}

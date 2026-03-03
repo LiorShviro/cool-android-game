@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,9 +9,9 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { hapticService } from '../../services/hapticService';
-import { TennisBallSvg } from '../../assets/svg/stations/TennisBallSvg';
 import { THEME } from '../../assets/theme';
 import { useUIScale } from '../../hooks/useUIScale';
+import { STATION_PNGS } from '../../assets/png/stations';
 
 interface DogDistractionProps {
   onSuccess: () => void;
@@ -21,36 +21,41 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
   const [taps, setTaps] = useState(0);
   const translateY = useSharedValue(0);
   const { scale } = useUIScale();
-  const bounceHeight = -48 * scale;
+  const stationScale = scale * 1.35;
+  const bounceHeight = -48 * stationScale;
   const scaledStyles = useMemo(
     () => ({
       container: {
-        minWidth: Math.round(130 * scale),
-        margin: Math.round(8 * scale),
-        paddingBottom: Math.round(12 * scale),
+        minWidth: Math.round(130 * stationScale),
+        margin: Math.round(8 * stationScale),
+        paddingBottom: Math.round(12 * stationScale),
       },
       shelfTop: {
-        paddingVertical: Math.round(6 * scale),
+        paddingVertical: Math.round(6 * stationScale),
       },
       stationLabel: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       court: {
-        width: Math.round(120 * scale),
-        height: Math.round(125 * scale),
-        marginTop: Math.round(8 * scale),
-        paddingBottom: Math.round(26 * scale),
+        width: Math.round(120 * stationScale),
+        height: Math.round(125 * stationScale),
+        marginTop: Math.round(8 * stationScale),
+        paddingBottom: Math.round(26 * stationScale),
       },
       ground: {
-        height: Math.round(22 * scale),
+        height: Math.round(22 * stationScale),
+      },
+      ball: {
+        width: Math.round(50 * stationScale),
+        height: Math.round(50 * stationScale),
       },
       tapDot: {
-        width: Math.round(8 * scale),
-        height: Math.round(8 * scale),
-        borderRadius: Math.round(4 * scale),
+        width: Math.round(8 * stationScale),
+        height: Math.round(8 * stationScale),
+        borderRadius: Math.round(4 * stationScale),
       },
     }),
-    [scale]
+    [stationScale]
   );
 
   useEffect(() => {
@@ -80,8 +85,6 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
     transform: [{ translateY: translateY.value }],
   }));
 
-  const tapsLeft = taps > 0 ? 3 - taps : 0;
-
   return (
     <View style={[styles.container, scaledStyles.container]}>
       <View style={[styles.shelfTop, scaledStyles.shelfTop]}>
@@ -94,7 +97,7 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
 
         <Pressable testID="dog-ball" onPress={handleTap}>
           <Animated.View style={animatedBallStyle}>
-            <TennisBallSvg size={Math.round(50 * scale)} tapsLeft={tapsLeft} />
+            <Image source={STATION_PNGS.dogBall} style={scaledStyles.ball} resizeMode="contain" />
           </Animated.View>
         </Pressable>
 
