@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
-import Svg, { Rect, Path, Circle, G } from 'react-native-svg';
+import Svg, { Rect, Path, Circle } from 'react-native-svg';
 import { THEME } from '../../assets/theme';
 import { useUIScale } from '../../hooks/useUIScale';
 

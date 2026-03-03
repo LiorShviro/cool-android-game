@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { PauseMenu } from '../components/PauseMenu';
-import { useGameStore, GameState } from '../store/gameStore';
+import { useGameStore } from '../store/gameStore';
 
 // Mock the store
 jest.mock('../store/gameStore', () => {

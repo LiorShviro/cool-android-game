@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   View,
   Text,
@@ -9,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore, GameState } from './src/store/gameStore';
 import { CharacterManager } from './src/components/CharacterManager';
 import { Character } from './src/components/Character';
@@ -137,7 +136,7 @@ const App = () => {
             </View>
             <Text style={styles.title}>Mamad Manager</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
-            <Text style={styles.versionText}>Build: 1.0 (Local)</Text>
+            <Text style={styles.versionText}>Version: 1.0.0</Text>
 
             <View style={styles.nameCard}>
               <Text style={styles.nameLabel}>PLAYER NAME</Text>

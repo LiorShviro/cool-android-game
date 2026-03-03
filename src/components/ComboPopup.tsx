@@ -31,7 +31,7 @@ export const ComboPopup: React.FC<ComboPopupProps> = ({ multiplier }) => {
         withTiming(0, { duration: 300 })
       );
     }
-  }, [multiplier]);
+  }, [multiplier, scale, opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

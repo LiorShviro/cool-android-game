@@ -1,3 +1,4 @@
+/* eslint-env jest */
 // Mock MMKV
 jest.mock('react-native-mmkv', () => {
   return {
@@ -56,7 +57,6 @@ jest.mock('react-native-reanimated', () => {
 
   return {
     useSharedValue: jest.fn((val) => ({ value: val })),
-    useAnimatedStyle: jest.fn((cb) => ({})),
     withTiming: jest.fn(handleWithTiming),
     cancelAnimation: jest.fn(),
     interpolateColor: jest.fn(() => 'green'),

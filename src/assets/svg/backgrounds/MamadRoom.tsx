@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Rect, Path, Circle, Ellipse, Line, G } from 'react-native-svg';
+import Svg, { Rect, Circle, Ellipse, Line, G } from 'react-native-svg';
 import { THEME } from '../../theme';
 
 interface MamadRoomProps {

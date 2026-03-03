@@ -117,7 +117,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
       );
       startBobAnimation(600);
     }
-  }, [character.timer, isMounted, isPaused, progress, startBobAnimation]);
+  }, [character.timer, isMounted, isPaused, progress, startBobAnimation, bobY, handleTimerExpire, isFulfilled]);
 
   // Speed up bob when urgent
   useAnimatedReaction(

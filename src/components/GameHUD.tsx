@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Svg, { Rect, Path, Text as SvgText } from 'react-native-svg';
+import Svg, { Rect } from 'react-native-svg';
 import { useGameStore } from '../store/gameStore';
 import { RocketHUD } from './RocketHUD';
 import { THEME } from '../assets/theme';

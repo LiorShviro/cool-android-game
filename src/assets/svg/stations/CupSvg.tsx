@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Path, G } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { THEME } from '../../theme';
 
@@ -10,7 +10,7 @@ interface CupSvgProps {
   scale?: number;
 }
 
-export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, isOverfilled, scale = 1 }) => {
+export const CupSvg: React.FC<CupSvgProps> = ({ fillProgress, scale = 1 }) => {
   const width = Math.round(70 * scale);
   const height = Math.round(100 * scale);
   const waterHeightMax = Math.round(72 * scale);

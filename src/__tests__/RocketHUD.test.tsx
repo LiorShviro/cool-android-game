@@ -34,7 +34,7 @@ describe('RocketHUD', () => {
       lives: 3,
     });
 
-    const { getAllByTestId } = render(<RocketHUD />);
+    render(<RocketHUD />);
     // Rockets are rendered as SVG components — check wrapper count via UNSAFE
     // Just verify it renders without crashing with 3 lives
     expect(true).toBeTruthy();

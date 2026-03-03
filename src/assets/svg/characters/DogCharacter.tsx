@@ -1,5 +1,5 @@
 import React from 'react';
-import Svg, { Circle, Rect, Path, Ellipse, G } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, Ellipse } from 'react-native-svg';
 import { THEME } from '../../theme';
 import { Mood } from './SabaCharacter';
 

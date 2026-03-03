@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, act } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { ChargingStation } from '../components/stations/ChargingStation';
-import { useSharedValue } from 'react-native-reanimated';
+
 
 // Mock Reanimated
 jest.mock('react-native-reanimated', () => {
@@ -54,10 +54,7 @@ describe('ChargingStation', () => {
   it('triggers onSuccess when dropped in correct zone', () => {
     const mockOnSuccess = jest.fn();
     
-    // We need to capture the callbacks passed to onUpdate and onEnd
-    let capturedOnEnd: any;
-    mockPan.onEnd.mockImplementation((cb) => {
-      capturedOnEnd = cb;
+    mockPan.onEnd.mockImplementation((_cb) => {
       return mockPan;
     });
 

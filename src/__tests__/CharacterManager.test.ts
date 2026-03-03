@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
 import { useCharacterManager } from '../hooks/useCharacterManager';
-import { useGameStore, GameState } from '../store/gameStore';
+import { GameState } from '../store/gameStore';
 import { act } from 'react-test-renderer';
 
 // Mock the store dynamically
