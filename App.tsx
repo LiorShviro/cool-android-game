@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +24,7 @@ import { ComboPopup } from './src/components/ComboPopup';
 import { storageService, LeaderboardEntry } from './src/services/storageService';
 import { TutorialScreen } from './src/components/TutorialScreen';
 import { LeaderboardScreen } from './src/components/LeaderboardScreen';
-import { MamadRoom } from './src/assets/svg/backgrounds/MamadRoom';
+import { BACKGROUND_PNGS } from './src/assets/png/backgrounds';
 import { THEME } from './src/assets/theme';
 import { useUIScale } from './src/hooks/useUIScale';
 
@@ -50,21 +51,21 @@ const App = () => {
   } = useGameStore();
   const { width, height, scale } = useUIScale();
   const [nameInput, setNameInput] = useState('');
-  const scaledLayout = React.useMemo(
-    () => ({
+  const scaledLayout = React.useMemo(() => {
+    const sizeScale = scale * 1.35;
+    return {
       characterZone: {
-        minHeight: Math.round(230 * scale),
+        minHeight: Math.round(230 * sizeScale),
       },
       stationArea: {
-        height: Math.round(230 * scale),
+        height: Math.round(230 * sizeScale),
       },
       stationScroll: {
-        paddingHorizontal: Math.round(10 * scale),
-        paddingVertical: Math.round(8 * scale),
+        paddingHorizontal: Math.round(10 * sizeScale),
+        paddingVertical: Math.round(8 * sizeScale),
       },
-    }),
-    [scale]
-  );
+    };
+  }, [scale]);
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
@@ -305,7 +306,12 @@ const App = () => {
       <SafeAreaProvider>
         {/* Full-screen Mamad Room background */}
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          <MamadRoom width={width} height={height} opacity={gameState === GameState.PLAYING ? 1 : 0.55} />
+          <Image
+            source={BACKGROUND_PNGS.mamadRoom}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+            opacity={gameState === GameState.PLAYING ? 1 : 0.55}
+          />
         </View>
         {renderScreen()}
       </SafeAreaProvider>
@@ -338,6 +344,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     alignItems: 'center',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
   },
   logoTitle: {
     fontSize: 36,

@@ -7,25 +7,59 @@ This document lists the main UI files and the safest knobs to customize the look
   - Colors, radii, and shared tokens used by all UI components.
   - Prefer updating colors here instead of hardcoding.
 
-## Character Art
-- SVGs live in `src/assets/svg/characters/`:
-  - `SabaCharacter.tsx`
-  - `ParentCharacter.tsx`
-  - `TeenCharacter.tsx`
-  - `DogCharacter.tsx`
+## Character Art (PNG)
+- PNGs live in `src/assets/png/characters/`.
+- File names (snake_case, 3 moods each):
+  - `saba_neutral.png`, `saba_impatient.png`, `saba_urgent.png`
+  - `parent_neutral.png`, `parent_impatient.png`, `parent_urgent.png`
+  - `teen_neutral.png`, `teen_impatient.png`, `teen_urgent.png`
+  - `dog_neutral.png`, `dog_impatient.png`, `dog_urgent.png`
 - Character selection logic is in `src/components/Character.tsx` (see `CharacterAvatar`).
-- Size is controlled via the `size` prop passed from `Character.tsx`.
+- PNG mapping is in `src/assets/png/characters/index.ts`.
+- Size is controlled in `Character.tsx` via the `avatarSize` calculation.
 
-## Station Art
-- Station SVGs live in `src/assets/svg/stations/`:
-  - `CupSvg.tsx` (Water)
-  - `SnackBagSvg.tsx` (Snacks)
-  - `TennisBallSvg.tsx` (Dog)
-- Station layouts are in `src/components/stations/`.
-  - Each station uses `useUIScale()` for responsive sizing.
+## Station Art (PNG)
+- PNGs live in `src/assets/png/stations/`.
+- Required files:
+  - `charge_phone.png`, `charge_plug.png`
+  - `water_cup_base.png`
+  - `snack_bag.png`
+  - `dog_ball.png`
+  - `reception_hand_phone.png`
+- Station PNG mapping is in `src/assets/png/stations/index.ts`.
+- Station layouts are in `src/components/stations/` and use `useUIScale()` for responsive sizing.
+
+## PNG Asset Specs
+Use transparent backgrounds and draw to the full canvas (leave ~10% padding).
+
+**Characters**
+- Canvas ratio: 1 : 1.3 (width : height)
+- Suggested sizes:
+  - `@1x` 200×260
+  - `@2x` 400×520
+  - `@3x` 600×780
+
+**Stations**
+- Use readable, chunky silhouettes and bold outlines.
+- Suggested sizes (per asset):
+  - `charge_phone`: 120×160 (@1x)
+  - `charge_plug`: 90×120 (@1x)
+  - `water_cup_base`: 140×200 (@1x)
+  - `snack_bag`: 120×160 (@1x)
+  - `dog_ball`: 120×120 (@1x)
+  - `reception_hand_phone`: 140×160 (@1x)
+- For `@2x` and `@3x`, multiply each dimension by 2 or 3.
+
+**Background**
+- `@1x` 1080×1920 (portrait)
+- `@2x` 2160×3840
+- `@3x` 3240×5760
+- Keep empty space near the top for UI overlays (logo, header).
 
 ## Background
-- Main background: `src/assets/svg/backgrounds/MamadRoom.tsx`
+- Main background PNG: `src/assets/png/backgrounds/mamad_room.png`
+  - Optional hi-res: `mamad_room@2x.png`, `mamad_room@3x.png`
+- Background mapping: `src/assets/png/backgrounds/index.ts`
 - Background is rendered in `App.tsx` behind all screens.
 
 ## Layout & Sizing

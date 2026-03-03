@@ -1,45 +1,79 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useSharedValue, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, cancelAnimation, Easing } from 'react-native-reanimated';
 import { hapticService } from '../../services/hapticService';
-import { CupSvg } from '../../assets/svg/stations/CupSvg';
 import { THEME } from '../../assets/theme';
 import { useUIScale } from '../../hooks/useUIScale';
+import { STATION_PNGS } from '../../assets/png/stations';
 
 interface WaterPitcherProps {
   onSuccess: () => void;
 }
+
+const CupPng: React.FC<{ fillProgress: ReturnType<typeof useSharedValue>; scale: number }> = ({
+  fillProgress,
+  scale,
+}) => {
+  const width = Math.round(70 * scale);
+  const height = Math.round(100 * scale);
+  const waterHeightMax = Math.round(72 * scale);
+  const waterInset = Math.round(7 * scale);
+
+  const waterStyle = useAnimatedStyle(() => {
+    const pct = Math.min(1, fillProgress.value / 1.5);
+    const waterHeight = Math.max(0, pct * waterHeightMax);
+    return {
+      height: waterHeight,
+      backgroundColor: fillProgress.value > 1.2 ? '#FF4444' : '#33b5e5',
+    };
+  });
+
+  return (
+    <View style={[styles.cupContainer, { width, height }]}>
+      <View
+        style={[
+          styles.waterContainer,
+          { left: waterInset, right: waterInset, height: waterHeightMax, bottom: Math.round(8 * scale) },
+        ]}
+      >
+        <Animated.View style={[styles.water, waterStyle]} />
+      </View>
+      <Image source={STATION_PNGS.waterCupBase} style={StyleSheet.absoluteFill} resizeMode="contain" />
+    </View>
+  );
+};
 
 export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const [isLocked, setIsLocked] = useState(false);
   const fillProgress = useSharedValue(0);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { scale } = useUIScale();
+  const stationScale = scale * 1.35;
   const scaledStyles = useMemo(
     () => ({
       container: {
-        minWidth: Math.round(130 * scale),
-        margin: Math.round(8 * scale),
-        paddingBottom: Math.round(12 * scale),
+        minWidth: Math.round(130 * stationScale),
+        margin: Math.round(8 * stationScale),
+        paddingBottom: Math.round(12 * stationScale),
       },
       shelfTop: {
-        paddingVertical: Math.round(6 * scale),
+        paddingVertical: Math.round(6 * stationScale),
       },
       stationLabel: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       button: {
-        paddingVertical: Math.round(9 * scale),
-        paddingHorizontal: Math.round(16 * scale),
+        paddingVertical: Math.round(9 * stationScale),
+        paddingHorizontal: Math.round(16 * stationScale),
       },
       buttonText: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       lockText: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
     }),
-    [scale]
+    [stationScale]
   );
 
   const handlePressIn = () => {
@@ -90,7 +124,7 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
 
       {/* Cup visual */}
       <View style={styles.cupWrapper}>
-        <CupSvg fillProgress={fillProgress} isOverfilled={isLocked} scale={scale} />
+        <CupPng fillProgress={fillProgress} scale={stationScale} />
         {isLocked && (
           <View style={styles.lockOverlay}>
             <Text style={[styles.lockText, scaledStyles.lockText]}>LOCKED</Text>
@@ -126,6 +160,22 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.outline,
     paddingBottom: 10,
     minWidth: 110,
+  },
+  cupContainer: {
+    backgroundColor: 'transparent',
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    overflow: 'hidden',
+  },
+  waterContainer: {
+    position: 'absolute',
+    bottom: 8,
+    justifyContent: 'flex-end',
+    overflow: 'hidden',
+  },
+  water: {
+    width: '100%',
+    borderRadius: 2,
   },
   shelfTop: {
     width: '100%',
