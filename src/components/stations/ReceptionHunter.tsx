@@ -22,7 +22,7 @@ const TICK_MS = 50;
 
 export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) => {
   const { scale } = useUIScale();
-  const stationScale = scale * 1.35;
+  const stationScale = scale * 1.15;
   const clampRange = 60 * stationScale;
   const sweetSpotX = useRef(randomSweetSpot(clampRange));
   const handX = useSharedValue(0);

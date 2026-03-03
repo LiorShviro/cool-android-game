@@ -14,9 +14,9 @@ const CupPng: React.FC<{ fillProgress: ReturnType<typeof useSharedValue>; scale:
   fillProgress,
   scale,
 }) => {
-  const width = Math.round(70 * scale);
-  const height = Math.round(100 * scale);
-  const waterHeightMax = Math.round(72 * scale);
+  const width = Math.round(90 * scale);
+  const height = Math.round(126 * scale);
+  const waterHeightMax = Math.round(98 * scale);
   const waterInset = Math.round(7 * scale);
 
   const waterStyle = useAnimatedStyle(() => {
@@ -38,6 +38,9 @@ const CupPng: React.FC<{ fillProgress: ReturnType<typeof useSharedValue>; scale:
       >
         <Animated.View style={[styles.water, waterStyle]} />
       </View>
+      <View style={styles.fillTrack}>
+        <Animated.View style={[styles.fillBar, waterStyle]} />
+      </View>
       <Image source={STATION_PNGS.waterCupBase} style={StyleSheet.absoluteFill} resizeMode="contain" />
     </View>
   );
@@ -48,7 +51,7 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const fillProgress = useSharedValue(0);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { scale } = useUIScale();
-  const stationScale = scale * 1.35;
+  const stationScale = scale * 1.15;
   const scaledStyles = useMemo(
     () => ({
       container: {
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   waterContainer: {
     position: 'absolute',
@@ -176,6 +179,23 @@ const styles = StyleSheet.create({
   water: {
     width: '100%',
     borderRadius: 2,
+  },
+  fillTrack: {
+    position: 'absolute',
+    right: 6,
+    bottom: 10,
+    width: 10,
+    height: 88,
+    borderRadius: 6,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+    borderWidth: 2,
+    borderColor: '#222',
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  fillBar: {
+    width: '100%',
+    borderRadius: 4,
   },
   shelfTop: {
     width: '100%',

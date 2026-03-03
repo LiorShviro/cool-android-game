@@ -21,7 +21,7 @@ interface ChargingStationProps {
 
 export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) => {
   const { scale } = useUIScale();
-  const stationScale = scale * 1.35;
+  const stationScale = scale * 1.15;
   const phoneRange = 50 * stationScale;
   const phoneX = useSharedValue(-phoneRange);
   const plugX = useSharedValue(0);

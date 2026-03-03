@@ -12,7 +12,7 @@ interface SnackSorterProps {
 export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
   const pan = useRef(new Animated.ValueXY()).current;
   const { scale } = useUIScale();
-  const stationScale = scale * 1.35;
+  const stationScale = scale * 1.15;
   const swipeThreshold = 30 * stationScale;
   const scaledStyles = useMemo(
     () => ({
@@ -41,6 +41,11 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
       },
       arrowText: {
         fontSize: Math.max(14, Math.round(16 * stationScale)),
+      },
+      sideSnack: {
+        width: Math.round(42 * stationScale),
+        height: Math.round(56 * stationScale),
+        marginTop: Math.round(4 * stationScale),
       },
       snackSize: {
         width: Math.round(60 * stationScale),
@@ -86,6 +91,7 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
         <View style={[styles.sideLabel, scaledStyles.sideLabel]}>
           <Text style={[styles.sideLabelText, scaledStyles.sideLabelText]}>BISLI</Text>
           <Text style={[styles.arrowText, scaledStyles.arrowText]}>←</Text>
+          <Image source={STATION_PNGS.bisly} style={scaledStyles.sideSnack} resizeMode="contain" />
         </View>
 
         {/* Draggable snack bag */}
@@ -104,6 +110,7 @@ export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
         <View style={[styles.sideLabel, scaledStyles.sideLabel]}>
           <Text style={[styles.arrowText, scaledStyles.arrowText]}>→</Text>
           <Text style={[styles.sideLabelText, scaledStyles.sideLabelText]}>BAMBA</Text>
+          <Image source={STATION_PNGS.bamba} style={scaledStyles.sideSnack} resizeMode="contain" />
         </View>
       </View>
     </View>

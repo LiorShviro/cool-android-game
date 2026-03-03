@@ -64,7 +64,7 @@ export const storageService = {
     if (score >= 3001) return 'Chief of Home Front';
     if (score >= 1501) return 'Safe Room Pro';
     if (score >= 501) return 'Snack Commander';
-    return 'Mamad Rookie';
+    return 'MelechHaMamad Rookie';
   },
 
   saveScore: (entry: LeaderboardEntry) => {

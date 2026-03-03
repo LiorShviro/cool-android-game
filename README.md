@@ -1,6 +1,6 @@
-# Mamad Manager (Safe Room Chaos)
+# MelechHaMamad (Safe Room Chaos)
 
-**Mamad Manager** is a fast-paced, 2D reflex and time-management game built with React Native. You take on the role of a safe room manager in Israel, juggling the needs of stressed adults, bored kids, and an energetic dog while the siren sounds.
+**MelechHaMamad** is a fast-paced, 2D reflex and time-management game built with React Native. You take on the role of a safe room manager in Israel, juggling the needs of stressed adults, bored kids, and an energetic dog while the siren sounds.
 
 ## 🚀 Premise
 The siren has sounded, the heavy iron door is shut, and now you have to keep everyone inside calm until the Home Front Command gives the all-clear. If the room's overall "Stress Meter" maxes out, it's Game Over!
@@ -59,7 +59,7 @@ npm test
 ## 🤖 CI/CD
 This project uses **GitHub Actions** to automatically build and version Android APKs on every push to `main`.
 - Download the latest build from the **Actions** tab in GitHub.
-- Look for the `MamadManager-v1.0.x` artifact.
+- Look for the `MelechHaMamad-v1.0.x` artifact.
 
 ---
 *Created with the Conductor Methodology.*
