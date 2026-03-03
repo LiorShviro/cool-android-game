@@ -26,7 +26,7 @@ export const PauseMenu: React.FC = () => {
             <Text style={styles.title}>GAME PAUSED</Text>
           </View>
 
-          <Text style={styles.flavorText}>Taking a breather in the Mamad...</Text>
+          <Text style={styles.flavorText}>Taking a breather in the safe room...</Text>
 
           <TouchableOpacity style={styles.resumeButton} onPress={togglePause}>
             <Text style={styles.buttonText}>RESUME</Text>
