@@ -1,0 +1,51 @@
+ name: Mamad Standalone Build
+
+  on:
+    push:
+      branches: [ public ]
+    workflow_dispatch:
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Set up JDK 17
+          uses: actions/setup-java@v4
+          with:
+            java-version: '17'
+            distribution: 'zulu'
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '22'
+
+        - name: Install dependencies
+          run: npm install --silent
+
+        - name: Setup Gradle
+          uses: gradle/actions/setup-gradle@v4
+
+        - name: Inject version into UI
+          run: |
+            sed -i "s/Build: 1.0 (Local)/Build: 1.0.${{ github.run_number }}/g" App.tsx
+
+        - name: Build Android APK
+          run: |
+            cd android
+            # Set version and skip linting to speed up build
+            ./gradlew assembleRelease -PversionCode=${{ github.run_number }} -PversionName="1.0.${{ github.run_number }}" -x lint
+
+        - name: Prepare APK artifact
+          run: |
+            mkdir -p versions_apk
+            cp android/app/build/outputs/apk/release/app-release.apk versions_apk/version2.apk
+
+        - name: Upload APK
+          uses: actions/upload-artifact@v4
+          with:
+            name: version2
+            path: versions_apk/version2.apk
