@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +24,7 @@ import { ComboPopup } from './src/components/ComboPopup';
 import { storageService, LeaderboardEntry } from './src/services/storageService';
 import { TutorialScreen } from './src/components/TutorialScreen';
 import { LeaderboardScreen } from './src/components/LeaderboardScreen';
-import { MamadRoom } from './src/assets/svg/backgrounds/MamadRoom';
+import { BACKGROUND_PNGS } from './src/assets/png/backgrounds';
 import { THEME } from './src/assets/theme';
 import { useUIScale } from './src/hooks/useUIScale';
 
@@ -50,21 +51,22 @@ const App = () => {
   } = useGameStore();
   const { width, height, scale } = useUIScale();
   const [nameInput, setNameInput] = useState('');
-  const scaledLayout = React.useMemo(
-    () => ({
+  const scaledLayout = React.useMemo(() => {
+    const characterScale = scale * 2.3;
+    const stationScale = scale * 1.15;
+    return {
       characterZone: {
-        minHeight: Math.round(230 * scale),
+        minHeight: Math.round(230 * characterScale),
       },
       stationArea: {
-        height: Math.round(230 * scale),
+        height: Math.round(230 * stationScale * 0.8),
       },
       stationScroll: {
-        paddingHorizontal: Math.round(10 * scale),
-        paddingVertical: Math.round(8 * scale),
+        paddingHorizontal: Math.round(10 * stationScale),
+        paddingVertical: Math.round(8 * stationScale),
       },
-    }),
-    [scale]
-  );
+    };
+  }, [scale]);
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
@@ -116,12 +118,12 @@ const App = () => {
   };
 
   const needSummary = [
-    { key: 'WATER', label: 'WATER' },
-    { key: 'BISLI', label: 'BISLI' },
-    { key: 'BAMBA', label: 'BAMBA' },
-    { key: 'PET', label: 'DOG' },
-    { key: 'CHARGING', label: 'CHARGE' },
-    { key: 'RECEPTION', label: 'RECEPTION' },
+    { key: 'WATER', label: 'Water cups handed' },
+    { key: 'BISLI', label: 'Bisli given' },
+    { key: 'BAMBA', label: 'Bamba given' },
+    { key: 'PET', label: 'Dog calmed' },
+    { key: 'CHARGING', label: 'Phones charged' },
+    { key: 'RECEPTION', label: 'Reception found' },
   ];
 
   const renderScreen = () => {
@@ -131,10 +133,10 @@ const App = () => {
           <View style={styles.centered}>
             {/* Logo block */}
             <View style={styles.logoBadge}>
-              <Text style={styles.logoTitle}>מממד</Text>
-              <Text style={styles.logoSubtitle}>מנג׳ר</Text>
+              <Text style={styles.logoTitle}>מלך</Text>
+              <Text style={styles.logoSubtitle}>הממד</Text>
             </View>
-            <Text style={styles.title}>Mamad Manager</Text>
+            <Text style={styles.title}>MelechHaMamad</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
             <Text style={styles.versionText}>Version: 1.0.0</Text>
 
@@ -181,48 +183,53 @@ const App = () => {
 
       return (
         <SafeAreaView style={styles.fullScreen}>
-          <View style={styles.centered}>
-            <View style={[styles.logoBadge, { backgroundColor: THEME.colors.red }]}>
-              <Text style={styles.gameOverIcon}>😱</Text>
-            </View>
-            <Text style={[styles.title, { color: THEME.colors.red }]}>GAME OVER</Text>
-            <Text style={styles.gameOverFlavor}>The Mamad is in chaos!</Text>
-            <View style={styles.scoreBadge}>
-              <Text style={styles.finalScore}>{score}</Text>
-              <Text style={styles.finalScoreLabel}>POINTS</Text>
-            </View>
-            <Text style={styles.rankText}>{storageService.getRank(score)}</Text>
-            {positionText !== '' && (
-              <Text style={styles.positionText}>{positionText}</Text>
-            )}
+          <ScrollView contentContainerStyle={styles.gameOverScroll} showsVerticalScrollIndicator={false}>
+            <View style={styles.centered}>
+            <View style={styles.shareCard}>
+              <View style={[styles.logoBadge, styles.shareLogo]}>
+                <Text style={styles.logoTitle}>מלך</Text>
+                <Text style={styles.logoSubtitle}>הממד</Text>
+              </View>
+              <Text style={styles.shareTitle}>MelechHaMamad</Text>
+              <Text style={styles.gameOverFlavor}>The safe room is in chaos!</Text>
 
-            <View style={styles.summaryCard}>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>TIME</Text>
-                <Text style={styles.summaryValue}>{durationText}</Text>
+              <View style={styles.scoreBadge}>
+                <Text style={styles.finalScore}>{score}</Text>
+                <Text style={styles.finalScoreLabel}>POINTS</Text>
               </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>FULFILLED</Text>
-                <Text style={styles.summaryValue}>{needsFulfilled}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>MISSED</Text>
-                <Text style={styles.summaryValue}>{missedNeeds}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>MAX COMBO</Text>
-                <Text style={styles.summaryValue}>{maxCombo}</Text>
-              </View>
-            </View>
+              <Text style={styles.rankText}>{storageService.getRank(score)}</Text>
+              {positionText !== '' && (
+                <Text style={styles.positionText}>{positionText}</Text>
+              )}
 
-            <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>NEEDS FILLED</Text>
-              {needSummary.map((item) => (
-                <View key={item.key} style={styles.summaryRow}>
-                  <Text style={styles.summaryLabel}>{item.label}</Text>
-                  <Text style={styles.summaryValue}>{needsFulfilledByNeed[item.key as keyof typeof needsFulfilledByNeed] ?? 0}</Text>
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>TIME</Text>
+                  <Text style={styles.summaryValue}>{durationText}</Text>
                 </View>
-              ))}
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>FULFILLED</Text>
+                  <Text style={styles.summaryValue}>{needsFulfilled}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>MISSED</Text>
+                  <Text style={styles.summaryValue}>{missedNeeds}</Text>
+                </View>
+                <View style={styles.summaryRow}>
+                  <Text style={styles.summaryLabel}>MAX COMBO</Text>
+                  <Text style={styles.summaryValue}>{maxCombo}</Text>
+                </View>
+              </View>
+
+              <View style={styles.summaryCard}>
+                <Text style={styles.summaryTitle}>NEEDS FILLED</Text>
+                {needSummary.map((item) => (
+                  <View key={item.key} style={styles.summaryRow}>
+                    <Text style={styles.summaryLabel}>{item.label}</Text>
+                    <Text style={styles.summaryValue}>{needsFulfilledByNeed[item.key as keyof typeof needsFulfilledByNeed] ?? 0}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
 
             <TouchableOpacity style={styles.mainButton} onPress={startGame}>
@@ -236,7 +243,8 @@ const App = () => {
             <TouchableOpacity style={styles.secondaryButton} onPress={() => setGameState(GameState.START)}>
               <Text style={styles.secondaryButtonText}>MAIN MENU</Text>
             </TouchableOpacity>
-          </View>
+            </View>
+          </ScrollView>
         </SafeAreaView>
       );
     }
@@ -305,7 +313,12 @@ const App = () => {
       <SafeAreaProvider>
         {/* Full-screen Mamad Room background */}
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          <MamadRoom width={width} height={height} opacity={gameState === GameState.PLAYING ? 1 : 0.55} />
+          <Image
+            source={BACKGROUND_PNGS.mamadRoom}
+            style={styles.backgroundImage}
+            resizeMode="contain"
+            opacity={gameState === GameState.PLAYING ? 1 : 0.55}
+          />
         </View>
         {renderScreen()}
       </SafeAreaProvider>
@@ -338,6 +351,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     alignItems: 'center',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    transform: [{ scale: 0.95 }],
   },
   logoTitle: {
     fontSize: 36,
@@ -457,10 +475,35 @@ const styles = StyleSheet.create({
   gameOverIcon: {
     fontSize: 42,
   },
+  shareCard: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: THEME.borderRadius.large,
+    padding: 18,
+    marginBottom: 16,
+    borderWidth: 3,
+    borderColor: THEME.colors.outline,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 6,
+    alignItems: 'center',
+  },
+  shareLogo: {
+    marginBottom: 10,
+  },
+  shareTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+    marginBottom: 6,
+  },
   gameOverFlavor: {
     fontSize: 15,
     color: THEME.colors.red,
     marginBottom: 16,
+    textAlign: 'center',
   },
   scoreBadge: {
     backgroundColor: THEME.colors.orange,
@@ -526,6 +569,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: THEME.colors.outline,
+  },
+  gameOverScroll: {
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    alignItems: 'center',
   },
   gameArea: {
     flex: 1,

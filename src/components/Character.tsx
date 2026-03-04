@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,12 +15,11 @@ import Animated, {
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
 import { hapticService } from '../services/hapticService';
 import { SPEECH_LINES } from '../constants/gameConstants';
-import { SabaCharacter, Mood } from '../assets/svg/characters/SabaCharacter';
-import { TeenCharacter } from '../assets/svg/characters/TeenCharacter';
-import { ParentCharacter } from '../assets/svg/characters/ParentCharacter';
-import { DogCharacter } from '../assets/svg/characters/DogCharacter';
+import { getCharacterPng, CharacterMood, CharacterPngKey } from '../assets/png/characters';
 import { THEME } from '../assets/theme';
 import { useUIScale } from '../hooks/useUIScale';
+
+type Mood = CharacterMood;
 
 interface CharacterProps {
   character: CharacterType;
@@ -32,11 +31,17 @@ const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number; siz
   variant,
   size,
 }) => {
-  if (type === 'DOG') return <DogCharacter mood={mood} size={Math.round(size * 1.1)} />;
-  if (type === 'KID') return <TeenCharacter mood={mood} size={Math.round(size * 0.95)} />;
-  // ADULT: alternate between Saba and Parent based on variant
-  if (variant % 2 === 0) return <SabaCharacter mood={mood} size={Math.round(size * 0.98)} />;
-  return <ParentCharacter mood={mood} size={Math.round(size * 0.98)} />;
+  const scaleMultiplier = type === 'DOG' ? 0.5625 : type === 'KID' ? 0.95 : 0.98;
+  const adjustedSize = Math.round(size * scaleMultiplier);
+  const key: CharacterPngKey =
+    type === 'DOG' ? 'dog' : type === 'KID' ? 'teen' : variant % 2 === 0 ? 'saba' : 'parent';
+  return (
+    <Image
+      source={getCharacterPng(key, mood)}
+      style={{ width: adjustedSize, height: Math.round(adjustedSize * 1.3) }}
+      resizeMode="contain"
+    />
+  );
 };
 
 export const Character: React.FC<CharacterProps> = ({ character }) => {
@@ -48,6 +53,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   const isFulfilled = useSharedValue(false);
   const isInitialMount = useRef(true);
   const { scale } = useUIScale();
+  const sizeScale = scale * 2.6;
 
   // Deterministic visual variant per character
   const variant = useMemo(() => {
@@ -181,7 +187,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   );
 
   const speechText = SPEECH_LINES[character.need] ?? character.need;
-  const avatarSize = Math.round(72 * scale);
+  const avatarSize = Math.round(72 * sizeScale);
   const scaledStyles = useMemo(
     () => ({
       container: {
@@ -189,33 +195,33 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         margin: Math.round(8 * scale),
       },
       speechBubble: {
-        maxWidth: Math.round(110 * scale),
-        paddingHorizontal: Math.round(7 * scale),
-        paddingVertical: Math.round(5 * scale),
-        borderRadius: Math.round(12 * scale),
-        borderWidth: Math.max(2, Math.round(2.5 * scale)),
+        maxWidth: Math.round(110 * scale * 0.8),
+        paddingHorizontal: Math.round(7 * scale * 0.8),
+        paddingVertical: Math.round(5 * scale * 0.8),
+        borderRadius: Math.round(12 * scale * 0.8),
+        borderWidth: Math.max(2, Math.round(2.5 * scale * 0.8)),
       },
       speechText: {
-        fontSize: Math.max(9, Math.round(10 * scale)),
+        fontSize: Math.max(8, Math.round(10 * scale * 0.8)),
       },
       bubbleTail: {
-        borderLeftWidth: Math.max(5, Math.round(6 * scale)),
-        borderRightWidth: Math.max(5, Math.round(6 * scale)),
-        borderTopWidth: Math.max(6, Math.round(7 * scale)),
+        borderLeftWidth: Math.max(4, Math.round(6 * scale * 0.8)),
+        borderRightWidth: Math.max(4, Math.round(6 * scale * 0.8)),
+        borderTopWidth: Math.max(5, Math.round(7 * scale * 0.8)),
       },
       timerBarTrack: {
-        width: Math.round(78 * scale),
-        height: Math.max(6, Math.round(7 * scale)),
-        marginTop: Math.round(4 * scale),
+        width: Math.round(78 * scale * 0.8),
+        height: Math.max(5, Math.round(7 * scale * 0.8)),
+        marginTop: Math.round(4 * scale * 0.8),
       },
       fulfilledBadge: {
-        transform: [{ scale }],
+        transform: [{ scale: scale * 0.9 }],
       },
       fulfilledText: {
-        fontSize: Math.max(10, Math.round(11 * scale)),
+        fontSize: Math.max(9, Math.round(11 * scale * 0.8)),
       },
     }),
-    [scale]
+    [scale, sizeScale]
   );
 
   return (

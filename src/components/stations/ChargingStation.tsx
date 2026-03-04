@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,86 +11,53 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { hapticService } from '../../services/hapticService';
-import Svg, { Rect, Circle } from 'react-native-svg';
-
 import { THEME } from '../../assets/theme';
 import { useUIScale } from '../../hooks/useUIScale';
+import { STATION_PNGS } from '../../assets/png/stations';
 
 interface ChargingStationProps {
   onSuccess: () => void;
 }
 
-const PhoneSvg: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
-  <Svg width={Math.round(38 * scale)} height={Math.round(52 * scale)} viewBox="0 0 38 52">
-    <Rect x={1} y={1} width={36} height={50} rx={5} fill="#222" stroke={THEME.colors.outline} strokeWidth={2} />
-    <Rect x={4} y={5} width={30} height={36} rx={2} fill="#4A90D9" />
-    {/* Screen content lines */}
-    <Rect x={8} y={10} width={22} height={3} rx={1.5} fill="#88BBFF" opacity={0.7} />
-    <Rect x={8} y={16} width={18} height={3} rx={1.5} fill="#88BBFF" opacity={0.5} />
-    <Rect x={8} y={22} width={20} height={3} rx={1.5} fill="#88BBFF" opacity={0.5} />
-    {/* Battery indicator */}
-    <Rect x={13} y={27} width={12} height={8} rx={2} fill="none" stroke="#FF6060" strokeWidth={1.5} />
-    <Rect x={13} y={27} width={4} height={8} rx={2} fill="#FF6060" opacity={0.7} />
-    <Rect x={25} y={29} width={2} height={4} rx={1} fill="#FF6060" />
-    {/* Home button */}
-    <Circle cx={19} cy={47} r={2.5} fill="#555" stroke="#888" strokeWidth={1} />
-    {/* Charging port */}
-    <Rect x={15} y={48} width={8} height={3} rx={1.5} fill="#555" />
-  </Svg>
-);
-
-const PlugSvg: React.FC<{ scale?: number }> = ({ scale = 1 }) => (
-  <Svg width={Math.round(30 * scale)} height={Math.round(38 * scale)} viewBox="0 0 30 38">
-    {/* Cable body */}
-    <Rect x={12} y={0} width={6} height={16} rx={3} fill="#888" stroke={THEME.colors.outline} strokeWidth={1.5} />
-    {/* Plug head */}
-    <Rect x={6} y={14} width={18} height={14} rx={4} fill="#555" stroke={THEME.colors.outline} strokeWidth={2} />
-    {/* Prongs */}
-    <Rect x={9} y={28} width={4} height={10} rx={2} fill="#333" stroke={THEME.colors.outline} strokeWidth={1.5} />
-    <Rect x={17} y={28} width={4} height={10} rx={2} fill="#333" stroke={THEME.colors.outline} strokeWidth={1.5} />
-    {/* LED */}
-    <Circle cx={15} cy={21} r={2} fill="#00FF88" opacity={0.8} />
-  </Svg>
-);
-
 export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) => {
   const { scale } = useUIScale();
-  const phoneRange = 50 * scale;
+  const stationScale = scale * 1.15;
+  const phoneRange = 50 * stationScale;
   const phoneX = useSharedValue(-phoneRange);
   const plugX = useSharedValue(0);
   const plugY = useSharedValue(0);
   const scaledStyles = useMemo(
     () => ({
       container: {
-        minWidth: Math.round(130 * scale),
-        margin: Math.round(8 * scale),
-        paddingBottom: Math.round(12 * scale),
+        minWidth: Math.round(130 * stationScale),
+        margin: Math.round(8 * stationScale),
+        paddingBottom: Math.round(12 * stationScale),
       },
       shelfTop: {
-        paddingVertical: Math.round(6 * scale),
+        paddingVertical: Math.round(6 * stationScale),
       },
       stationLabel: {
-        fontSize: Math.max(11, Math.round(12 * scale)),
+        fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       track: {
-        width: Math.round(120 * scale),
-        height: Math.round(150 * scale),
-        paddingVertical: Math.round(14 * scale),
-        marginTop: Math.round(8 * scale),
+        width: Math.round(120 * stationScale),
+        height: Math.round(150 * stationScale),
+        paddingVertical: Math.round(14 * stationScale),
+        marginTop: Math.round(8 * stationScale),
       },
       phone: {
-        width: Math.round(38 * scale),
-        height: Math.round(52 * scale),
+        width: Math.round(38 * stationScale),
+        height: Math.round(52 * stationScale),
       },
       plug: {
-        width: Math.round(30 * scale),
-        height: Math.round(38 * scale),
+        width: Math.round(30 * stationScale),
+        height: Math.round(38 * stationScale),
       },
     }),
-    [scale]
+    [stationScale]
   );
-  const successDist = 40 * scale;
-  const yThreshold = -25 * scale;
+  const successDist = 40 * stationScale;
+  const yThreshold = -25 * stationScale;
 
   useEffect(() => {
     phoneX.value = withRepeat(
@@ -143,11 +110,11 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
 
       <View style={[styles.track, scaledStyles.track]}>
         <Animated.View style={[styles.phone, scaledStyles.phone, phoneAnimStyle]}>
-          <PhoneSvg scale={scale} />
+          <Image source={STATION_PNGS.chargePhone} style={styles.phoneImage} resizeMode="contain" />
         </Animated.View>
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.plug, scaledStyles.plug, plugAnimStyle]} testID="charging-plug">
-            <PlugSvg scale={scale} />
+            <Image source={STATION_PNGS.chargePlug} style={styles.plugImage} resizeMode="contain" />
           </Animated.View>
         </GestureDetector>
       </View>
@@ -203,10 +170,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  phoneImage: {
+    width: '100%',
+    height: '100%',
+  },
   plug: {
     width: 30,
     height: 38,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  plugImage: {
+    width: '100%',
+    height: '100%',
   },
 });
