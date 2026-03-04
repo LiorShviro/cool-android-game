@@ -56,10 +56,21 @@ We use Jest and React Native Testing Library for robust logic and component veri
 npm test
 ```
 
+## 📲 Install APK (v2)
+The latest local build is available at:
+`versions_apk/version2.apk`
+
+### Install on Android
+1. Transfer `versions_apk/version2.apk` to your device.
+2. Enable **Install unknown apps** for your file manager (Android Settings → Security).
+3. Tap the APK to install.
+
 ## 🤖 CI/CD
 This project uses **GitHub Actions** to automatically build and version Android APKs on every push to `main`.
 - Download the latest build from the **Actions** tab in GitHub.
 - Look for the `MelechHaMamad-v1.0.x` artifact.
+
+> Note: The `versions_apk/version2.apk` file may be newer than the Actions artifact if you built locally.
 
 ---
 *Created with the Conductor Methodology.*
