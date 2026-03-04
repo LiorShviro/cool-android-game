@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useGameStore, GameState, CharacterType, Character } from '../store/gameStore';
-import { CHARACTER_CONFIG, SPAWN_INTERVAL } from '../constants/gameConstants';
+import { CHARACTER_CONFIG, SPAWN_INTERVAL, pickSpeechLine } from '../constants/gameConstants';
 
 export const useCharacterManager = () => {
   const { gameState, addCharacter, activeCharacters, score, isPaused } = useGameStore();
@@ -26,6 +26,7 @@ export const useCharacterManager = () => {
       id: Math.random().toString(36).substring(7),
       type: randomType,
       need: randomNeed,
+      speechLine: pickSpeechLine(randomNeed),
       timer: currentTimer,
       status: 'ACTIVE',
     };

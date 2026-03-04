@@ -56,7 +56,7 @@ const App = () => {
     const stationScale = scale * 1.15;
     return {
       characterZone: {
-        minHeight: Math.round(230 * characterScale),
+        minHeight: Math.round(80 * scale),
       },
       stationArea: {
         height: Math.round(230 * stationScale * 0.8),
@@ -186,6 +186,9 @@ const App = () => {
           <ScrollView contentContainerStyle={styles.gameOverScroll} showsVerticalScrollIndicator={false}>
             <View style={styles.centered}>
             <View style={styles.shareCard}>
+              <View style={styles.shareRibbon}>
+                <Text style={styles.shareRibbonText}>RUN SUMMARY</Text>
+              </View>
               <View style={[styles.logoBadge, styles.shareLogo]}>
                 <Text style={styles.logoTitle}>מלך</Text>
                 <Text style={styles.logoSubtitle}>הממד</Text>
@@ -285,8 +288,8 @@ const App = () => {
           </View>
         )}
 
-        <View style={styles.gameArea}>
-          <View style={[styles.characterZone, scaledLayout.characterZone]}>
+        <View style={styles.gameArea} pointerEvents="box-none">
+          <View style={[styles.characterZone, scaledLayout.characterZone]} pointerEvents="box-none">
             {activeCharacters.map((char) => (
               <Character key={char.id} character={char} />
             ))}
@@ -294,7 +297,7 @@ const App = () => {
         </View>
 
         {/* Station shelf area */}
-        <View style={[styles.stationArea, scaledLayout.stationArea]}>
+        <View style={[styles.stationArea, scaledLayout.stationArea]} pointerEvents="auto">
           <View style={styles.shelfEdge} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.stationScroll, scaledLayout.stationScroll]}>
             <WaterPitcher onSuccess={() => fulfillNeed('WATER')} />
@@ -477,18 +480,35 @@ const styles = StyleSheet.create({
   },
   shareCard: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: THEME.borderRadius.large,
     padding: 18,
     marginBottom: 16,
     borderWidth: 3,
     borderColor: THEME.colors.outline,
+    borderTopWidth: 6,
+    borderTopColor: THEME.colors.orange,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
     elevation: 6,
     alignItems: 'center',
+  },
+  shareRibbon: {
+    backgroundColor: THEME.colors.yellow,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.pill,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
+    marginBottom: 10,
+  },
+  shareRibbonText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+    letterSpacing: 1,
   },
   shareLogo: {
     marginBottom: 10,
@@ -577,20 +597,23 @@ const styles = StyleSheet.create({
   },
   gameArea: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    zIndex: 1,
   },
   characterZone: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     minHeight: 200,
+    zIndex: 1,
   },
   stationArea: {
     height: 195,
     borderTopWidth: 3,
     borderTopColor: THEME.colors.outline,
     backgroundColor: THEME.colors.wall,
+    zIndex: 5,
   },
   shelfEdge: {
     height: 10,

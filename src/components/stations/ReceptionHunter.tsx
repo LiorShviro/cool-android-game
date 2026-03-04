@@ -22,7 +22,7 @@ const TICK_MS = 50;
 
 export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) => {
   const { scale } = useUIScale();
-  const stationScale = scale * 1.15;
+  const stationScale = scale * 0.95;
   const clampRange = 60 * stationScale;
   const sweetSpotX = useRef(randomSweetSpot(clampRange));
   const handX = useSharedValue(0);
@@ -65,8 +65,8 @@ export const ReceptionHunter: React.FC<ReceptionHunterProps> = ({ onSuccess }) =
         height: Math.round(60 * stationScale),
       },
       handImage: {
-        width: Math.round(44 * stationScale),
-        height: Math.round(50 * stationScale),
+        width: Math.round(50 * stationScale),
+        height: Math.round(56 * stationScale),
       },
     }),
     [stationScale]
@@ -265,8 +265,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hand: {
-    width: 44,
-    height: 50,
+    width: 50,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
   },
