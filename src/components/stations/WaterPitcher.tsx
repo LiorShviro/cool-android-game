@@ -10,14 +10,20 @@ interface WaterPitcherProps {
   onSuccess: () => void;
 }
 
+const CUP_BASE_WIDTH = 110;
+const CUP_BASE_HEIGHT = 150;
+const CUP_WATER_HEIGHT = 114;
+const CUP_WATER_INSET = 8;
+const CUP_FILL_TRACK_HEIGHT = 104;
+
 const CupPng: React.FC<{ fillProgress: ReturnType<typeof useSharedValue>; scale: number }> = ({
   fillProgress,
   scale,
 }) => {
-  const width = Math.round(90 * scale);
-  const height = Math.round(126 * scale);
-  const waterHeightMax = Math.round(98 * scale);
-  const waterInset = Math.round(7 * scale);
+  const width = Math.round(CUP_BASE_WIDTH * scale);
+  const height = Math.round(CUP_BASE_HEIGHT * scale);
+  const waterHeightMax = Math.round(CUP_WATER_HEIGHT * scale);
+  const waterInset = Math.round(CUP_WATER_INSET * scale);
 
   const waterStyle = useAnimatedStyle(() => {
     const pct = Math.min(1, fillProgress.value / 1.5);
@@ -38,10 +44,10 @@ const CupPng: React.FC<{ fillProgress: ReturnType<typeof useSharedValue>; scale:
       >
         <Animated.View style={[styles.water, waterStyle]} />
       </View>
-      <View style={styles.fillTrack}>
+      <View style={[styles.fillTrack, { height: Math.round(CUP_FILL_TRACK_HEIGHT * scale) }]}>
         <Animated.View style={[styles.fillBar, waterStyle]} />
       </View>
-      <Image source={STATION_PNGS.waterCupBase} style={StyleSheet.absoluteFill} resizeMode="contain" />
+      <Image source={STATION_PNGS.waterCupBase} style={styles.cupImage} resizeMode="contain" />
     </View>
   );
 };
@@ -51,32 +57,38 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
   const fillProgress = useSharedValue(0);
   const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { scale } = useUIScale();
-  const stationScale = scale * 1.15;
+  const stationScale = scale * 0.95;
+  const cupWidth = Math.round(CUP_BASE_WIDTH * stationScale);
+  const cupHeight = Math.round(CUP_BASE_HEIGHT * stationScale);
   const scaledStyles = useMemo(
     () => ({
       container: {
         minWidth: Math.round(130 * stationScale),
         margin: Math.round(8 * stationScale),
-        paddingBottom: Math.round(12 * stationScale),
+        paddingBottom: Math.round(2 * stationScale),
       },
       shelfTop: {
-        paddingVertical: Math.round(6 * stationScale),
+        paddingVertical: Math.round(2 * stationScale),
       },
       stationLabel: {
         fontSize: Math.max(11, Math.round(12 * stationScale)),
       },
       button: {
-        paddingVertical: Math.round(9 * stationScale),
-        paddingHorizontal: Math.round(16 * stationScale),
+        paddingVertical: Math.round(4 * stationScale),
+        paddingHorizontal: Math.round(12 * stationScale),
       },
       buttonText: {
-        fontSize: Math.max(11, Math.round(12 * stationScale)),
+        fontSize: Math.max(9, Math.round(10 * stationScale)),
       },
       lockText: {
-        fontSize: Math.max(11, Math.round(12 * stationScale)),
+        fontSize: Math.max(9, Math.round(10 * stationScale)),
+      },
+      cupWrapper: {
+        width: cupWidth,
+        height: cupHeight,
       },
     }),
-    [stationScale]
+    [stationScale, cupHeight, cupWidth]
   );
 
   const handlePressIn = () => {
@@ -126,7 +138,7 @@ export const WaterPitcher: React.FC<WaterPitcherProps> = ({ onSuccess }) => {
       </View>
 
       {/* Cup visual */}
-      <View style={styles.cupWrapper}>
+      <View style={[styles.cupWrapper, scaledStyles.cupWrapper]}>
         <CupPng fillProgress={fillProgress} scale={stationScale} />
         {isLocked && (
           <View style={styles.lockOverlay}>
@@ -168,13 +180,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
-    overflow: 'visible',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   waterContainer: {
     position: 'absolute',
     bottom: 8,
     justifyContent: 'flex-end',
     overflow: 'hidden',
+    zIndex: 1,
   },
   water: {
     width: '100%',
@@ -192,10 +208,19 @@ const styles = StyleSheet.create({
     borderColor: '#222',
     overflow: 'hidden',
     justifyContent: 'flex-end',
+    zIndex: 1,
   },
   fillBar: {
     width: '100%',
     borderRadius: 4,
+  },
+  cupImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    zIndex: 3,
   },
   shelfTop: {
     width: '100%',
@@ -216,8 +241,11 @@ const styles = StyleSheet.create({
     textShadowRadius: 1,
   },
   cupWrapper: {
-    marginVertical: 8,
+    marginVertical: 0,
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   lockOverlay: {
     ...StyleSheet.absoluteFillObject,

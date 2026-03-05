@@ -21,7 +21,7 @@ interface ChargingStationProps {
 
 export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) => {
   const { scale } = useUIScale();
-  const stationScale = scale * 1.15;
+  const stationScale = scale * 0.95;
   const phoneRange = 50 * stationScale;
   const phoneX = useSharedValue(-phoneRange);
   const plugX = useSharedValue(0);
@@ -46,12 +46,12 @@ export const ChargingStation: React.FC<ChargingStationProps> = ({ onSuccess }) =
         marginTop: Math.round(8 * stationScale),
       },
       phone: {
-        width: Math.round(38 * stationScale),
-        height: Math.round(52 * stationScale),
+        width: Math.round(42 * stationScale),
+        height: Math.round(58 * stationScale),
       },
       plug: {
-        width: Math.round(30 * stationScale),
-        height: Math.round(38 * stationScale),
+        width: Math.round(34 * stationScale),
+        height: Math.round(44 * stationScale),
       },
     }),
     [stationScale]
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   phone: {
-    width: 38,
-    height: 52,
+    width: 42,
+    height: 58,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -175,8 +175,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   plug: {
-    width: 30,
-    height: 38,
+    width: 34,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },

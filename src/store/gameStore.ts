@@ -17,6 +17,7 @@ export interface Character {
   id: string;
   type: CharacterType;
   need: string;
+  speechLine?: string;
   timer: number;
   status: 'ACTIVE' | 'FULFILLED';
   fulfilledAt?: number;
