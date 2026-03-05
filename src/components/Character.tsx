@@ -14,10 +14,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Character as CharacterType, useGameStore } from '../store/gameStore';
 import { hapticService } from '../services/hapticService';
-import { SPEECH_LINES } from '../constants/gameConstants';
+import { pickSpeechLine } from '../constants/gameConstants';
 import { getCharacterPng, CharacterMood, CharacterPngKey } from '../assets/png/characters';
 import { THEME } from '../assets/theme';
 import { useUIScale } from '../hooks/useUIScale';
+import { STATION_PNGS } from '../assets/png/stations';
 
 type Mood = CharacterMood;
 
@@ -44,8 +45,17 @@ const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number; siz
   );
 };
 
+const NEED_ICON = {
+  WATER: STATION_PNGS.waterCupBase,
+  BAMBA: STATION_PNGS.bamba,
+  BISLI: STATION_PNGS.bisly,
+  PET: STATION_PNGS.dogBall,
+  CHARGING: STATION_PNGS.chargePhone,
+  RECEPTION: STATION_PNGS.receptionHandPhone,
+} as const;
+
 export const Character: React.FC<CharacterProps> = ({ character }) => {
-  const { decrementLives, removeCharacter, isPaused } = useGameStore();
+  const { decrementLives, removeCharacter, isPaused, activeCharacters } = useGameStore();
   const progress = useSharedValue(1);
   const bobY = useSharedValue(0);
   const isMounted = useSharedValue(true);
@@ -53,7 +63,8 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   const isFulfilled = useSharedValue(false);
   const isInitialMount = useRef(true);
   const { scale } = useUIScale();
-  const sizeScale = scale * 2.6;
+  const rowScale = activeCharacters.length >= 4 ? 0.85 : activeCharacters.length >= 3 ? 0.92 : 1;
+  const sizeScale = scale * 2.6 * rowScale;
 
   // Deterministic visual variant per character
   const variant = useMemo(() => {
@@ -64,7 +75,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
   const startBobAnimation = useCallback((durationMs: number) => {
     bobY.value = withRepeat(
       withSequence(
-        withTiming(-6, { duration: durationMs, easing: Easing.inOut(Easing.sin) }),
+        withTiming(-2, { duration: durationMs, easing: Easing.inOut(Easing.sin) }),
         withTiming(0, { duration: durationMs, easing: Easing.inOut(Easing.sin) })
       ),
       -1,
@@ -186,23 +197,43 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
     }
   );
 
-  const speechText = SPEECH_LINES[character.need] ?? character.need;
+  const speechText = useMemo(
+    () => character.speechLine ?? pickSpeechLine(character.need),
+    [character.need, character.speechLine, character.id]
+  );
+  const speechIcon = NEED_ICON[character.need as keyof typeof NEED_ICON];
   const avatarSize = Math.round(72 * sizeScale);
+  const avatarHeight = Math.round(avatarSize * 1.3);
+  const timerBarHeight = Math.max(5, Math.round(7 * scale * 0.8));
   const scaledStyles = useMemo(
     () => ({
       container: {
-        width: Math.round(110 * scale),
-        margin: Math.round(8 * scale),
+        width: Math.round(110 * scale * rowScale),
+        margin: Math.round(6 * scale * rowScale),
+        height: Math.round(avatarHeight + timerBarHeight + 4 * scale),
+      },
+      bubbleWrap: {
+        position: 'absolute',
+        top: Math.round(-2 * scale),
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 2,
       },
       speechBubble: {
-        maxWidth: Math.round(110 * scale * 0.8),
-        paddingHorizontal: Math.round(7 * scale * 0.8),
-        paddingVertical: Math.round(5 * scale * 0.8),
+        maxWidth: Math.round(120 * scale * 0.85 * rowScale),
+        paddingHorizontal: Math.round(7 * scale * 0.8 * rowScale),
+        paddingVertical: Math.round(5 * scale * 0.8 * rowScale),
         borderRadius: Math.round(12 * scale * 0.8),
         borderWidth: Math.max(2, Math.round(2.5 * scale * 0.8)),
       },
+      speechIcon: {
+        width: Math.round(18 * scale * 0.8 * rowScale),
+        height: Math.round(18 * scale * 0.8 * rowScale),
+        marginRight: Math.round(4 * scale * 0.8),
+      },
       speechText: {
-        fontSize: Math.max(8, Math.round(10 * scale * 0.8)),
+        fontSize: Math.max(8, Math.round(10 * scale * 0.8 * rowScale)),
       },
       bubbleTail: {
         borderLeftWidth: Math.max(4, Math.round(6 * scale * 0.8)),
@@ -211,8 +242,28 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
       },
       timerBarTrack: {
         width: Math.round(78 * scale * 0.8),
-        height: Math.max(5, Math.round(7 * scale * 0.8)),
-        marginTop: Math.round(4 * scale * 0.8),
+        height: timerBarHeight,
+        position: 'absolute',
+        bottom: Math.round(1 * scale),
+        alignSelf: 'center',
+      },
+      avatarWrap: {
+        height: avatarHeight,
+        width: '100%',
+        justifyContent: 'flex-end',
+      },
+      avatarHolder: {
+        height: avatarHeight,
+      },
+      groundShadow: {
+        width: Math.round(avatarSize * 0.7),
+        height: Math.round(avatarSize * 0.12),
+        borderRadius: Math.round(avatarSize * 0.2),
+      },
+      groundAnchor: {
+        width: Math.round(avatarSize * 0.35),
+        height: Math.round(avatarSize * 0.06),
+        borderRadius: Math.round(avatarSize * 0.12),
       },
       fulfilledBadge: {
         transform: [{ scale: scale * 0.9 }],
@@ -221,23 +272,34 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         fontSize: Math.max(9, Math.round(11 * scale * 0.8)),
       },
     }),
-    [scale, sizeScale]
+    [scale, sizeScale, avatarHeight, timerBarHeight, rowScale, activeCharacters.length]
   );
 
   return (
     <View style={[styles.container, scaledStyles.container]}>
-      <Animated.View style={[styles.speechBubble, bubbleBorderStyle, scaledStyles.speechBubble]}>
-        <Text style={[styles.speechText, scaledStyles.speechText]}>{speechText}</Text>
-        {character.status === 'FULFILLED' && (
-          <View style={[styles.fulfilledBadge, scaledStyles.fulfilledBadge]}>
-            <Text style={[styles.fulfilledText, scaledStyles.fulfilledText]}>✓</Text>
+      <View style={[styles.bubbleWrap, scaledStyles.bubbleWrap]}>
+        <Animated.View style={[styles.speechBubble, bubbleBorderStyle, scaledStyles.speechBubble]}>
+          <View style={styles.speechContent}>
+            {speechIcon && <Image source={speechIcon} style={[styles.speechIcon, scaledStyles.speechIcon]} resizeMode="contain" />}
+            <Text style={[styles.speechText, scaledStyles.speechText]}>{speechText}</Text>
           </View>
-        )}
-      </Animated.View>
-      <View style={[styles.bubbleTail, scaledStyles.bubbleTail]} />
-      <Animated.View style={bobStyle}>
-        <CharacterAvatar type={character.type} mood={currentMood} variant={variant} size={avatarSize} />
-      </Animated.View>
+          {character.status === 'FULFILLED' && (
+            <View style={[styles.fulfilledBadge, scaledStyles.fulfilledBadge]}>
+              <Text style={[styles.fulfilledText, scaledStyles.fulfilledText]}>✓</Text>
+            </View>
+          )}
+        </Animated.View>
+        <View style={[styles.bubbleTail, scaledStyles.bubbleTail]} />
+      </View>
+
+      <View style={[styles.avatarWrap, scaledStyles.avatarWrap]}>
+        <View style={[styles.groundShadow, scaledStyles.groundShadow]} />
+        <View style={[styles.groundAnchor, scaledStyles.groundAnchor]} />
+        <Animated.View style={[styles.avatarHolder, scaledStyles.avatarHolder, bobStyle]}>
+          <CharacterAvatar type={character.type} mood={currentMood} variant={variant} size={avatarSize} />
+        </Animated.View>
+      </View>
+
       <View style={[styles.timerBarTrack, scaledStyles.timerBarTrack]}>
         <Animated.View style={[styles.timerBarFill, timerBarStyle]} />
       </View>
@@ -257,10 +319,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 2,
   },
+  bubbleWrap: {
+    alignItems: 'center',
+  },
+  speechContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  speechIcon: {
+    tintColor: undefined,
+  },
   speechText: {
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#333',
+    flexShrink: 1,
   },
   fulfilledBadge: {
     position: 'absolute',
@@ -285,6 +360,25 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderTopColor: THEME.colors.offWhite,
     marginTop: -1,
+  },
+  avatarWrap: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    position: 'relative',
+  },
+  avatarHolder: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  groundShadow: {
+    backgroundColor: 'rgba(0,0,0,0.22)',
+    position: 'absolute',
+    bottom: 0,
+  },
+  groundAnchor: {
+    backgroundColor: 'rgba(0,0,0,0.32)',
+    position: 'absolute',
+    bottom: 0,
   },
   timerBarTrack: {
     backgroundColor: 'rgba(0,0,0,0.15)',

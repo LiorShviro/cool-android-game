@@ -42,6 +42,7 @@ export const GameHUD: React.FC = () => {
           <PauseButtonSvg />
         </TouchableOpacity>
       </View>
+      <Text style={styles.gameTitle}>MelechHaMamad</Text>
     </View>
   );
 };
@@ -57,6 +58,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
+  },
+  gameTitle: {
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+    textShadowColor: 'rgba(255,255,255,0.6)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   scoreBadge: {
     width: 90,

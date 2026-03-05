@@ -12,7 +12,7 @@ interface SnackSorterProps {
 export const SnackSorter: React.FC<SnackSorterProps> = ({ onSuccess }) => {
   const pan = useRef(new Animated.ValueXY()).current;
   const { scale } = useUIScale();
-  const stationScale = scale * 1.15;
+  const stationScale = scale * 0.95;
   const swipeThreshold = 30 * stationScale;
   const scaledStyles = useMemo(
     () => ({

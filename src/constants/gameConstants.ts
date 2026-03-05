@@ -1,10 +1,16 @@
-export const SPEECH_LINES: Record<string, string> = {
-  WATER: '💧 I\'m thirsty!',
-  CHARGING: '🔋 Phone dying!',
-  RECEPTION: '📶 No signal!',
-  BAMBA: '🥜 Want Bamba!',
-  BISLI: '🌀 Want Bisli!',
-  PET: '🐾 Pet me!',
+export const SPEECH_LINES_BY_NEED: Record<string, string[]> = {
+  WATER: ['I\'m thirsty!', 'Need water!', 'Pour me a cup!'],
+  CHARGING: ['Phone dying!', 'Charge me!', 'Low battery!'],
+  RECEPTION: ['No signal!', 'Find reception!', 'Help me call!'],
+  BAMBA: ['Want Bamba!', 'Bamba please!', 'Need a snack!'],
+  BISLI: ['Want Bisli!', 'Bisli please!', 'Snack time!'],
+  PET: ['Throw the ball!', 'Let\'s play!', 'Toss it!'],
+};
+
+export const pickSpeechLine = (need: string) => {
+  const lines = SPEECH_LINES_BY_NEED[need];
+  if (!lines || lines.length === 0) return need;
+  return lines[Math.floor(Math.random() * lines.length)];
 };
 
 export const CHARACTER_EMOJIS: Record<string, string[]> = {
