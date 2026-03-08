@@ -801,13 +801,25 @@
         <img src="assets/characters/saba_neutral@2x.png" alt="Saba">
       </div>
       <div class="parade-char">
-        <img src="assets/characters/parent_neutral@2x.png" alt="Parent">
+        <img src="assets/characters/grandma_neutral@2x.png" alt="Grandma">
       </div>
       <div class="parade-char">
-        <img src="assets/characters/teen_neutral@2x.png" alt="Teen">
+        <img src="assets/characters/mother_neutral@2x.png" alt="Mother">
+      </div>
+      <div class="parade-char">
+        <img src="assets/characters/boy_neutral@2x.png" alt="Boy">
+      </div>
+      <div class="parade-char">
+        <img src="assets/characters/toddler_neutral@2x.png" alt="Toddler">
       </div>
       <div class="parade-char">
         <img src="assets/characters/dog_neutral@2x.png" alt="Dog">
+      </div>
+      <div class="parade-char">
+        <img src="assets/characters/dog2_neutral@2x.png" alt="Dog 2">
+      </div>
+      <div class="parade-char">
+        <img src="assets/characters/cat_neutral@2x.png" alt="Cat">
       </div>
     </div>
 
@@ -831,6 +843,7 @@
         </ol>
       </div>
       <div class="version-badge">v2.0 · Free · Android only</div>
+      <div class="version-badge" id="download-count"></div>
     </div>
   </div>
 </section>
@@ -852,7 +865,7 @@
         <div class="alarm-box-row">
           <div class="alarm-stat-mini">
             <div class="label">Characters</div>
-            <div class="val">4</div>
+            <div class="val">12</div>
           </div>
           <div class="alarm-stat-mini">
             <div class="label">Stations</div>
@@ -916,6 +929,94 @@
           <img src="assets/characters/dog_neutral@2x.png" alt="Dog">
         </div>
         <div class="char-name">Dog</div>
+        <ul class="char-needs">
+          <li>Fetch (Ball)</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d1">
+        <div class="char-img-wrap">
+          <img src="assets/characters/grandma_neutral@2x.png" alt="Grandma">
+        </div>
+        <div class="char-name">Grandma</div>
+        <ul class="char-needs">
+          <li>Water</li>
+          <li>Phone Charging</li>
+          <li>Reception</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d2">
+        <div class="char-img-wrap">
+          <img src="assets/characters/mother_neutral@2x.png" alt="Mother">
+        </div>
+        <div class="char-name">Mother</div>
+        <ul class="char-needs">
+          <li>Water</li>
+          <li>Phone Charging</li>
+          <li>Reception</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d3">
+        <div class="char-img-wrap">
+          <img src="assets/characters/male_teen_neutral@2x.png" alt="Male Teen">
+        </div>
+        <div class="char-name">Male Teen</div>
+        <ul class="char-needs">
+          <li>Bamba</li>
+          <li>Bisli</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d4">
+        <div class="char-img-wrap">
+          <img src="assets/characters/boy_neutral@2x.png" alt="Boy">
+        </div>
+        <div class="char-name">Boy</div>
+        <ul class="char-needs">
+          <li>Bamba</li>
+          <li>Bisli</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d1">
+        <div class="char-img-wrap">
+          <img src="assets/characters/girl_neutral@2x.png" alt="Girl">
+        </div>
+        <div class="char-name">Girl</div>
+        <ul class="char-needs">
+          <li>Bamba</li>
+          <li>Bisli</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d2">
+        <div class="char-img-wrap">
+          <img src="assets/characters/toddler_neutral@2x.png" alt="Toddler">
+        </div>
+        <div class="char-name">Toddler</div>
+        <ul class="char-needs">
+          <li>Bamba</li>
+          <li>Bisli</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d3">
+        <div class="char-img-wrap">
+          <img src="assets/characters/cat_neutral@2x.png" alt="Cat">
+        </div>
+        <div class="char-name">Cat</div>
+        <ul class="char-needs">
+          <li>Fetch (Ball)</li>
+        </ul>
+      </div>
+
+      <div class="char-card reveal reveal-d4">
+        <div class="char-img-wrap">
+          <img src="assets/characters/dog2_neutral@2x.png" alt="Dog 2">
+        </div>
+        <div class="char-name">Dog 2</div>
         <ul class="char-needs">
           <li>Fetch (Ball)</li>
         </ul>
@@ -1066,6 +1167,18 @@
   );
 
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Download counter via GitHub Releases API
+  fetch('https://api.github.com/repos/LiorShviro/cool-android-game/releases')
+    .then(r => r.json())
+    .then(releases => {
+      const total = releases.reduce((sum, r) =>
+        sum + r.assets.reduce((s, a) => s + a.download_count, 0), 0);
+      if (total > 0) {
+        document.getElementById('download-count').textContent = total + ' downloads';
+      }
+    })
+    .catch(() => {});
 </script>
 </body>
 </html>

@@ -9,12 +9,13 @@ This document lists the main UI files and the safest knobs to customize the look
 
 ## Character Art (PNG)
 - PNGs live in `src/assets/png/characters/`.
-- File names (snake_case, 3 moods each):
-  - `saba_neutral.png`, `saba_impatient.png`, `saba_urgent.png`
-  - `parent_neutral.png`, `parent_impatient.png`, `parent_urgent.png`
-  - `teen_neutral.png`, `teen_impatient.png`, `teen_urgent.png`
-  - `dog_neutral.png`, `dog_impatient.png`, `dog_urgent.png`
-- Character selection logic is in `src/components/Character.tsx` (see `CharacterAvatar`).
+- File names (snake_case, 3 moods each). Current characters:
+  - **ADULT variants:** `saba`, `parent`, `grandma`, `soldier`, `neighbor`
+  - **KID variants:** `teen`, `toddler`
+  - **PET variants:** `dog`, `cat`
+  - Each has `_neutral.png`, `_impatient.png`, `_urgent.png` (plus `@2x`, `@3x`)
+- **Adding new variants:** extend `CHARACTER_VARIANTS` in `src/constants/gameConstants.ts`, add the PNG key to `VARIANT_TO_PNG_KEY`, add the new entry to `CharacterPngKey` union and `characterPngs` map in `src/assets/png/characters/index.ts`, and provide the PNG files.
+- The `visualKey` field on `Character` (store) stores the resolved PNG key per spawned character. `CharacterAvatar` in `Character.tsx` reads this field.
 - PNG mapping is in `src/assets/png/characters/index.ts`.
 - Size is controlled in `Character.tsx` via the `avatarSize` calculation.
 
@@ -59,8 +60,16 @@ Use transparent backgrounds and draw to the full canvas (leave ~10% padding).
 ## Background
 - Main background PNG: `src/assets/png/backgrounds/mamad_room.png`
   - Optional hi-res: `mamad_room@2x.png`, `mamad_room@3x.png`
+- Corridor background PNG: `src/assets/png/backgrounds/corridor.png` (used during Bathroom Break mini-game)
 - Background mapping: `src/assets/png/backgrounds/index.ts`
 - Background is rendered in `App.tsx` behind all screens.
+
+## Bathroom Break Mini-Game Assets
+- Runner PNG: `src/assets/png/obstacles/runner.png` (top-down character, 120×120 @1x)
+- Obstacle PNGs: `src/assets/png/obstacles/` — `box`, `chair`, `toy`, `shoe`, `bathroom_door` (each 80×80 @1x)
+- Obstacle mapping: `src/assets/png/obstacles/index.ts`
+- Component: `src/components/BathroomBreak.tsx`
+- Trigger hook: `src/hooks/useBathroomBreakTrigger.ts` — fires every `BATHROOM_BREAK_SCORE_INTERVAL` (2000) points
 
 ## Layout & Sizing
 - Responsive scaling hook: `src/hooks/useUIScale.ts`

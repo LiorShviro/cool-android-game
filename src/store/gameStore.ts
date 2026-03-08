@@ -6,6 +6,7 @@ export enum GameState {
   GAME_OVER = 'GAME_OVER',
   TUTORIAL = 'TUTORIAL',
   LEADERBOARD = 'LEADERBOARD',
+  SUPPLY_RUN = 'SUPPLY_RUN',
 }
 
 export type PausedScreen = 'NONE' | 'TUTORIAL' | 'LEADERBOARD';
@@ -21,6 +22,7 @@ export interface Character {
   timer: number;
   status: 'ACTIVE' | 'FULFILLED';
   fulfilledAt?: number;
+  visualKey?: string;
 }
 
 interface GameStore {
@@ -39,9 +41,12 @@ interface GameStore {
   needsFulfilled: number;
   needsFulfilledByNeed: Record<NeedType, number>;
   missedNeeds: number;
-  
+  lastSupplyRunScore: number;
+
   setGameState: (state: GameState) => void;
   startNewRun: () => void;
+  startSupplyRun: () => void;
+  endSupplyRun: (bonus: number) => void;
   setPlayerName: (name: string) => void;
   setPausedScreen: (screen: PausedScreen) => void;
   updateStressMeter: (amount: number) => void;
@@ -76,6 +81,7 @@ const initialState = {
     RECEPTION: 0,
   },
   missedNeeds: 0,
+  lastSupplyRunScore: 0,
 };
 
 export const useGameStore = create<GameStore>((set) => ({
@@ -90,6 +96,20 @@ export const useGameStore = create<GameStore>((set) => ({
       gameState: GameState.PLAYING,
       playerName: state.playerName,
       runStartedAt: Date.now(),
+    })),
+
+  startSupplyRun: () =>
+    set({
+      gameState: GameState.SUPPLY_RUN,
+      isPaused: true,
+    }),
+
+  endSupplyRun: (bonus: number) =>
+    set((state) => ({
+      gameState: GameState.PLAYING,
+      isPaused: false,
+      score: state.score + bonus,
+      lastSupplyRunScore: state.score + bonus,
     })),
 
   setPlayerName: (name: string) => set({ playerName: name }),

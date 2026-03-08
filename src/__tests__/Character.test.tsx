@@ -20,6 +20,7 @@ describe('Character Component', () => {
       removeCharacter: mockRemoveCharacter,
       decrementLives: mockDecrementLives,
       isPaused: false,
+      activeCharacters: [],
     });
   });
 

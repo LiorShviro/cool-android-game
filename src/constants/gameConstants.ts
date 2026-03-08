@@ -19,14 +19,29 @@ export const CHARACTER_EMOJIS: Record<string, string[]> = {
   DOG: ['🐕'],
 };
 
-// SVG visual variants per character type
-// ADULT alternates between SABA (grandpa) and PARENT based on character id
-// KID always renders TEEN
-// DOG always renders DOG
+// Visual variants per character type — extensible list
 export const CHARACTER_VARIANTS: Record<string, string[]> = {
-  ADULT: ['SABA', 'PARENT'],
-  KID: ['TEEN'],
-  DOG: ['DOG'],
+  ADULT: ['SABA', 'PARENT', 'GRANDMA', 'SOLDIER', 'NEIGHBOR', 'MOTHER'],
+  KID: ['TEEN', 'TODDLER', 'MALE_TEEN', 'BOY', 'GIRL'],
+  DOG: ['DOG', 'CAT', 'DOG2'],
+};
+
+// Maps variant name to CharacterPngKey
+export const VARIANT_TO_PNG_KEY: Record<string, string> = {
+  SABA: 'saba',
+  PARENT: 'parent',
+  TEEN: 'teen',
+  DOG: 'dog',
+  GRANDMA: 'grandma',
+  SOLDIER: 'soldier',
+  NEIGHBOR: 'neighbor',
+  TODDLER: 'toddler',
+  CAT: 'cat',
+  MOTHER: 'mother',
+  MALE_TEEN: 'male_teen',
+  BOY: 'boy',
+  GIRL: 'girl',
+  DOG2: 'dog2',
 };
 
 export const CHARACTER_CONFIG = {
@@ -47,4 +62,24 @@ export const CHARACTER_CONFIG = {
   },
 };
 
-export const SPAWN_INTERVAL = 4000; // 4s
+export const SPAWN_INTERVAL = 4000; // 4s base
+
+// Difficulty scaling constants
+export const SPAWN_INTERVAL_DECAY_PER_1K = 750;
+export const MIN_SPAWN_INTERVAL = 750;
+export const TIMER_DECAY_PER_1K = 1500;
+export const MIN_TIMER = 2000;
+export const MAX_ACTIVE_CHARACTERS = 4;
+export const MAX_ACTIVE_CHARACTERS_HIGH = 5;
+export const HIGH_SCORE_THRESHOLD = 5000;
+export const SUPPLY_RUN_SCORE_INTERVAL = 2000;
+
+export const SUPPLY_RUN_ITEMS: { key: string; displayName: string; tintColor: string }[] = [
+  { key: 'toilet_paper', displayName: 'נייר טואלט', tintColor: '#f0f0f0' },
+  { key: 'playing_cards', displayName: 'קלפים', tintColor: '#ef4444' },
+  { key: 'flashlight', displayName: 'פנס', tintColor: '#fbbf24' },
+  { key: 'stuffed_animal', displayName: 'בובה', tintColor: '#f472b6' },
+  { key: 'sandwich', displayName: 'כריך', tintColor: '#d97706' },
+  { key: 'cafe_shachor', displayName: 'קפה שחור', tintColor: '#451a03' },
+  { key: 'black_coffee', displayName: 'קפה שחור', tintColor: '#6b3a1f' },
+];

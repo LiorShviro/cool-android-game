@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { version } from './package.json';
 import {
   StyleSheet,
   View,
@@ -7,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Animated as RNAnimated,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +29,8 @@ import { LeaderboardScreen } from './src/components/LeaderboardScreen';
 import { BACKGROUND_PNGS } from './src/assets/png/backgrounds';
 import { THEME } from './src/assets/theme';
 import { useUIScale } from './src/hooks/useUIScale';
+import { useSupplyRunTrigger } from './src/hooks/useSupplyRunTrigger';
+import { SupplyRun } from './src/components/SupplyRun';
 
 const App = () => {
   const {
@@ -47,10 +51,29 @@ const App = () => {
     missedNeeds,
     runStartedAt,
     runEndedAt,
+    lives,
     fulfillNeed,
+    endSupplyRun,
   } = useGameStore();
+
+  useSupplyRunTrigger();
   const { width, height, scale } = useUIScale();
   const [nameInput, setNameInput] = useState('');
+
+  // Life-lost red flash
+  const lifeLostOpacity = useRef(new RNAnimated.Value(0)).current;
+  const prevLives = useRef(3);
+  useEffect(() => {
+    if (lives < prevLives.current && gameState === GameState.PLAYING) {
+      lifeLostOpacity.setValue(0.45);
+      RNAnimated.timing(lifeLostOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+    prevLives.current = lives;
+  }, [lives, gameState, lifeLostOpacity]);
   const scaledLayout = React.useMemo(() => {
     const characterScale = scale * 2.3;
     const stationScale = scale * 1.15;
@@ -138,7 +161,7 @@ const App = () => {
             </View>
             <Text style={styles.title}>MelechHaMamad</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
-            <Text style={styles.versionText}>Version: 1.0.0</Text>
+            <Text style={styles.versionText}>v{version}</Text>
 
             <View style={styles.nameCard}>
               <Text style={styles.nameLabel}>PLAYER NAME</Text>
@@ -265,6 +288,14 @@ const App = () => {
       );
     }
 
+    if (gameState === GameState.SUPPLY_RUN) {
+      return (
+        <SupplyRun
+          onComplete={(caught) => endSupplyRun(caught ? 500 : 0)}
+        />
+      );
+    }
+
     return (
       <SafeAreaView style={styles.fullScreen}>
         <CharacterManager />
@@ -273,20 +304,11 @@ const App = () => {
 
         <GameHUD />
 
-        {isPaused && pausedScreen === 'TUTORIAL' && (
-          <View style={styles.pausedScreenOverlay}>
-            <TutorialScreen onBack={() => setPausedScreen('NONE')} />
-          </View>
-        )}
-
-        {isPaused && pausedScreen === 'LEADERBOARD' && (
-          <View style={styles.pausedScreenOverlay}>
-            <LeaderboardScreen
-              entries={leaderboard}
-              onBack={() => setPausedScreen('NONE')}
-            />
-          </View>
-        )}
+        {/* Red flash on life lost */}
+        <RNAnimated.View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, styles.lifeLostFlash, { opacity: lifeLostOpacity }]}
+        />
 
         <View style={styles.gameArea} pointerEvents="box-none">
           <View style={[styles.characterZone, scaledLayout.characterZone]} pointerEvents="box-none">
@@ -307,6 +329,21 @@ const App = () => {
             <ReceptionHunter onSuccess={() => fulfillNeed('RECEPTION')} />
           </ScrollView>
         </View>
+
+        {isPaused && pausedScreen === 'TUTORIAL' && (
+          <View style={styles.pausedScreenOverlay}>
+            <TutorialScreen onBack={() => setPausedScreen('NONE')} />
+          </View>
+        )}
+
+        {isPaused && pausedScreen === 'LEADERBOARD' && (
+          <View style={styles.pausedScreenOverlay}>
+            <LeaderboardScreen
+              entries={leaderboard}
+              onBack={() => setPausedScreen('NONE')}
+            />
+          </View>
+        )}
       </SafeAreaView>
     );
   };
@@ -629,6 +666,11 @@ const styles = StyleSheet.create({
   pausedScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.75)',
+    zIndex: 10,
+  },
+  lifeLostFlash: {
+    backgroundColor: '#FF4444',
+    zIndex: 100,
   },
 });
 
