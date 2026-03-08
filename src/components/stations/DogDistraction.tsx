@@ -21,7 +21,7 @@ export const DogDistraction: React.FC<DogDistractionProps> = ({ onSuccess }) => 
   const [taps, setTaps] = useState(0);
   const translateY = useSharedValue(0);
   const { scale } = useUIScale();
-  const stationScale = scale * 1.15;
+  const stationScale = scale * 0.95;
   const bounceHeight = -48 * stationScale;
   const scaledStyles = useMemo(
     () => ({

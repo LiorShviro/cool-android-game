@@ -20,6 +20,7 @@ describe('Character Component', () => {
       removeCharacter: mockRemoveCharacter,
       decrementLives: mockDecrementLives,
       isPaused: false,
+      activeCharacters: [],
     });
   });
 
@@ -32,6 +33,7 @@ describe('Character Component', () => {
     id: '1',
     type: 'ADULT' as const,
     need: 'WATER',
+    speechLine: '💧 I\'m thirsty!',
     timer: 15000,
     status: 'ACTIVE' as const,
   };
@@ -39,7 +41,7 @@ describe('Character Component', () => {
   it('renders correctly with character speech line', () => {
     const { getByText } = render(<Character character={mockCharacter} />);
     
-    // Check for speech line based on WATER need (using regex to avoid emoji issues)
+    // Check for speech line (using regex to avoid emoji issues)
     expect(getByText(/I'm thirsty/)).toBeTruthy();
   });
 

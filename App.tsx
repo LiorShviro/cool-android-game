@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { version } from './package.json';
 import {
   StyleSheet,
   View,
@@ -7,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Animated as RNAnimated,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +29,8 @@ import { LeaderboardScreen } from './src/components/LeaderboardScreen';
 import { BACKGROUND_PNGS } from './src/assets/png/backgrounds';
 import { THEME } from './src/assets/theme';
 import { useUIScale } from './src/hooks/useUIScale';
+import { useSupplyRunTrigger } from './src/hooks/useSupplyRunTrigger';
+import { SupplyRun } from './src/components/SupplyRun';
 
 const App = () => {
   const {
@@ -47,16 +51,35 @@ const App = () => {
     missedNeeds,
     runStartedAt,
     runEndedAt,
+    lives,
     fulfillNeed,
+    endSupplyRun,
   } = useGameStore();
+
+  useSupplyRunTrigger();
   const { width, height, scale } = useUIScale();
   const [nameInput, setNameInput] = useState('');
+
+  // Life-lost red flash
+  const lifeLostOpacity = useRef(new RNAnimated.Value(0)).current;
+  const prevLives = useRef(3);
+  useEffect(() => {
+    if (lives < prevLives.current && gameState === GameState.PLAYING) {
+      lifeLostOpacity.setValue(0.45);
+      RNAnimated.timing(lifeLostOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+    prevLives.current = lives;
+  }, [lives, gameState, lifeLostOpacity]);
   const scaledLayout = React.useMemo(() => {
     const characterScale = scale * 2.3;
     const stationScale = scale * 1.15;
     return {
       characterZone: {
-        minHeight: Math.round(230 * characterScale),
+        minHeight: Math.round(80 * scale),
       },
       stationArea: {
         height: Math.round(230 * stationScale * 0.8),
@@ -138,7 +161,7 @@ const App = () => {
             </View>
             <Text style={styles.title}>MelechHaMamad</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
-            <Text style={styles.versionText}>Version: 1.0.0</Text>
+            <Text style={styles.versionText}>v{version}</Text>
 
             <View style={styles.nameCard}>
               <Text style={styles.nameLabel}>PLAYER NAME</Text>
@@ -186,6 +209,9 @@ const App = () => {
           <ScrollView contentContainerStyle={styles.gameOverScroll} showsVerticalScrollIndicator={false}>
             <View style={styles.centered}>
             <View style={styles.shareCard}>
+              <View style={styles.shareRibbon}>
+                <Text style={styles.shareRibbonText}>RUN SUMMARY</Text>
+              </View>
               <View style={[styles.logoBadge, styles.shareLogo]}>
                 <Text style={styles.logoTitle}>מלך</Text>
                 <Text style={styles.logoSubtitle}>הממד</Text>
@@ -262,6 +288,14 @@ const App = () => {
       );
     }
 
+    if (gameState === GameState.SUPPLY_RUN) {
+      return (
+        <SupplyRun
+          onComplete={(caught) => endSupplyRun(caught ? 500 : 0)}
+        />
+      );
+    }
+
     return (
       <SafeAreaView style={styles.fullScreen}>
         <CharacterManager />
@@ -269,6 +303,32 @@ const App = () => {
         <ComboPopup multiplier={Math.min(3, Math.floor(comboStreak / 2) + 1)} />
 
         <GameHUD />
+
+        {/* Red flash on life lost */}
+        <RNAnimated.View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, styles.lifeLostFlash, { opacity: lifeLostOpacity }]}
+        />
+
+        <View style={styles.gameArea} pointerEvents="box-none">
+          <View style={[styles.characterZone, scaledLayout.characterZone]} pointerEvents="box-none">
+            {activeCharacters.map((char) => (
+              <Character key={char.id} character={char} />
+            ))}
+          </View>
+        </View>
+
+        {/* Station shelf area */}
+        <View style={[styles.stationArea, scaledLayout.stationArea]} pointerEvents="auto">
+          <View style={styles.shelfEdge} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.stationScroll, scaledLayout.stationScroll]}>
+            <WaterPitcher onSuccess={() => fulfillNeed('WATER')} />
+            <SnackSorter onSuccess={(snack) => fulfillNeed(snack)} />
+            <DogDistraction onSuccess={() => fulfillNeed('PET')} />
+            <ChargingStation onSuccess={() => fulfillNeed('CHARGING')} />
+            <ReceptionHunter onSuccess={() => fulfillNeed('RECEPTION')} />
+          </ScrollView>
+        </View>
 
         {isPaused && pausedScreen === 'TUTORIAL' && (
           <View style={styles.pausedScreenOverlay}>
@@ -284,26 +344,6 @@ const App = () => {
             />
           </View>
         )}
-
-        <View style={styles.gameArea}>
-          <View style={[styles.characterZone, scaledLayout.characterZone]}>
-            {activeCharacters.map((char) => (
-              <Character key={char.id} character={char} />
-            ))}
-          </View>
-        </View>
-
-        {/* Station shelf area */}
-        <View style={[styles.stationArea, scaledLayout.stationArea]}>
-          <View style={styles.shelfEdge} />
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.stationScroll, scaledLayout.stationScroll]}>
-            <WaterPitcher onSuccess={() => fulfillNeed('WATER')} />
-            <SnackSorter onSuccess={(snack) => fulfillNeed(snack)} />
-            <DogDistraction onSuccess={() => fulfillNeed('PET')} />
-            <ChargingStation onSuccess={() => fulfillNeed('CHARGING')} />
-            <ReceptionHunter onSuccess={() => fulfillNeed('RECEPTION')} />
-          </ScrollView>
-        </View>
       </SafeAreaView>
     );
   };
@@ -477,18 +517,35 @@ const styles = StyleSheet.create({
   },
   shareCard: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: THEME.borderRadius.large,
     padding: 18,
     marginBottom: 16,
     borderWidth: 3,
     borderColor: THEME.colors.outline,
+    borderTopWidth: 6,
+    borderTopColor: THEME.colors.orange,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
     elevation: 6,
     alignItems: 'center',
+  },
+  shareRibbon: {
+    backgroundColor: THEME.colors.yellow,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: THEME.borderRadius.pill,
+    borderWidth: 2,
+    borderColor: THEME.colors.outline,
+    marginBottom: 10,
+  },
+  shareRibbonText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: THEME.colors.outline,
+    letterSpacing: 1,
   },
   shareLogo: {
     marginBottom: 10,
@@ -577,20 +634,23 @@ const styles = StyleSheet.create({
   },
   gameArea: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    zIndex: 1,
   },
   characterZone: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     minHeight: 200,
+    zIndex: 1,
   },
   stationArea: {
     height: 195,
     borderTopWidth: 3,
     borderTopColor: THEME.colors.outline,
     backgroundColor: THEME.colors.wall,
+    zIndex: 5,
   },
   shelfEdge: {
     height: 10,
@@ -606,6 +666,11 @@ const styles = StyleSheet.create({
   pausedScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.75)',
+    zIndex: 10,
+  },
+  lifeLostFlash: {
+    backgroundColor: '#FF4444',
+    zIndex: 100,
   },
 });
 
