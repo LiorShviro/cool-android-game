@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { version } from './package.json';
 import {
   StyleSheet,
   View,
@@ -160,7 +161,7 @@ const App = () => {
             </View>
             <Text style={styles.title}>MelechHaMamad</Text>
             <Text style={styles.subtitle}>Safe Room Chaos 🚀</Text>
-            <Text style={styles.versionText}>Version: 1.0.0</Text>
+            <Text style={styles.versionText}>v{version}</Text>
 
             <View style={styles.nameCard}>
               <Text style={styles.nameLabel}>PLAYER NAME</Text>
@@ -309,21 +310,6 @@ const App = () => {
           style={[StyleSheet.absoluteFill, styles.lifeLostFlash, { opacity: lifeLostOpacity }]}
         />
 
-        {isPaused && pausedScreen === 'TUTORIAL' && (
-          <View style={styles.pausedScreenOverlay}>
-            <TutorialScreen onBack={() => setPausedScreen('NONE')} />
-          </View>
-        )}
-
-        {isPaused && pausedScreen === 'LEADERBOARD' && (
-          <View style={styles.pausedScreenOverlay}>
-            <LeaderboardScreen
-              entries={leaderboard}
-              onBack={() => setPausedScreen('NONE')}
-            />
-          </View>
-        )}
-
         <View style={styles.gameArea} pointerEvents="box-none">
           <View style={[styles.characterZone, scaledLayout.characterZone]} pointerEvents="box-none">
             {activeCharacters.map((char) => (
@@ -343,6 +329,21 @@ const App = () => {
             <ReceptionHunter onSuccess={() => fulfillNeed('RECEPTION')} />
           </ScrollView>
         </View>
+
+        {isPaused && pausedScreen === 'TUTORIAL' && (
+          <View style={styles.pausedScreenOverlay}>
+            <TutorialScreen onBack={() => setPausedScreen('NONE')} />
+          </View>
+        )}
+
+        {isPaused && pausedScreen === 'LEADERBOARD' && (
+          <View style={styles.pausedScreenOverlay}>
+            <LeaderboardScreen
+              entries={leaderboard}
+              onBack={() => setPausedScreen('NONE')}
+            />
+          </View>
+        )}
       </SafeAreaView>
     );
   };
@@ -665,6 +666,7 @@ const styles = StyleSheet.create({
   pausedScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.75)',
+    zIndex: 10,
   },
   lifeLostFlash: {
     backgroundColor: '#FF4444',
