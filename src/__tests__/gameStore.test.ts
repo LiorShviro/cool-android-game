@@ -27,6 +27,7 @@ describe('Game Store', () => {
       RECEPTION: 0,
     });
     expect(state.missedNeeds).toBe(0);
+    expect(state.lastSupplyRunScore).toBe(0);
   });
 
   it('should update game state correctly', () => {
@@ -105,5 +106,26 @@ describe('Game Store', () => {
     const state = useGameStore.getState();
     expect(state.gameState).toBe(GameState.PLAYING);
     expect(state.runStartedAt).not.toBeNull();
+  });
+
+  it('should start supply run and pause game', () => {
+    const { startNewRun, startSupplyRun } = useGameStore.getState();
+    startNewRun();
+    startSupplyRun();
+    const state = useGameStore.getState();
+    expect(state.gameState).toBe(GameState.SUPPLY_RUN);
+    expect(state.isPaused).toBe(true);
+  });
+
+  it('should end supply run with bonus and resume', () => {
+    const { startNewRun, startSupplyRun, endSupplyRun } = useGameStore.getState();
+    startNewRun();
+    startSupplyRun();
+    endSupplyRun(500);
+    const state = useGameStore.getState();
+    expect(state.gameState).toBe(GameState.PLAYING);
+    expect(state.isPaused).toBe(false);
+    expect(state.score).toBe(500);
+    expect(state.lastSupplyRunScore).toBe(500);
   });
 });

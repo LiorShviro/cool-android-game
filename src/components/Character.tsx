@@ -26,22 +26,47 @@ interface CharacterProps {
   character: CharacterType;
 }
 
-const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number; size: number }> = ({
+// Characters with landscape art — use "cover" crop instead of "contain"
+const LANDSCAPE_CHARS = new Set<CharacterPngKey>(['mother', 'male_teen', 'boy']);
+
+// Downward shift (as fraction of adjustedSize) to compensate for transparent bottom padding in generated art
+const VARIANT_Y_SHIFT: Partial<Record<CharacterPngKey, number>> = {
+  girl: 0.12,
+  grandma: 0.08,
+  dog2: 0.08,
+};
+
+// Scale override for landscape chars that appear too large
+const LANDSCAPE_SCALE: Partial<Record<CharacterPngKey, number>> = {
+  boy: 0.78,
+};
+
+const CharacterAvatar: React.FC<{ type: string; mood: Mood; variant: number; size: number; visualKey?: string }> = ({
   type,
   mood,
   variant,
   size,
+  visualKey,
 }) => {
   const scaleMultiplier = type === 'DOG' ? 0.5625 : type === 'KID' ? 0.95 : 0.98;
   const adjustedSize = Math.round(size * scaleMultiplier);
-  const key: CharacterPngKey =
-    type === 'DOG' ? 'dog' : type === 'KID' ? 'teen' : variant % 2 === 0 ? 'saba' : 'parent';
+  let key: CharacterPngKey;
+  if (visualKey && (visualKey as CharacterPngKey)) {
+    key = visualKey as CharacterPngKey;
+  } else {
+    key = type === 'DOG' ? 'dog' : type === 'KID' ? 'teen' : variant % 2 === 0 ? 'saba' : 'parent';
+  }
+  const isLandscape = LANDSCAPE_CHARS.has(key);
+  const lsScale = LANDSCAPE_SCALE[key] ?? 1;
+  const yShift = Math.round((VARIANT_Y_SHIFT[key] ?? 0) * adjustedSize);
   return (
-    <Image
-      source={getCharacterPng(key, mood)}
-      style={{ width: adjustedSize, height: Math.round(adjustedSize * 1.3) }}
-      resizeMode="contain"
-    />
+    <View style={isLandscape ? { width: Math.round(adjustedSize * lsScale), height: Math.round(adjustedSize * 1.3 * lsScale), overflow: 'hidden' } : undefined}>
+      <Image
+        source={getCharacterPng(key, mood)}
+        style={{ width: Math.round(adjustedSize * lsScale), height: Math.round(adjustedSize * 1.3 * lsScale), transform: yShift ? [{ translateY: yShift }] : undefined }}
+        resizeMode={isLandscape ? 'cover' : 'contain'}
+      />
+    </View>
   );
 };
 
@@ -296,7 +321,7 @@ export const Character: React.FC<CharacterProps> = ({ character }) => {
         <View style={[styles.groundShadow, scaledStyles.groundShadow]} />
         <View style={[styles.groundAnchor, scaledStyles.groundAnchor]} />
         <Animated.View style={[styles.avatarHolder, scaledStyles.avatarHolder, bobStyle]}>
-          <CharacterAvatar type={character.type} mood={currentMood} variant={variant} size={avatarSize} />
+          <CharacterAvatar type={character.type} mood={currentMood} variant={variant} size={avatarSize} visualKey={character.visualKey} />
         </Animated.View>
       </View>
 

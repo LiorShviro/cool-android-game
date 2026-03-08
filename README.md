@@ -17,13 +17,15 @@ Latest APK locations:
 
 ## 🎮 How to Play
 - **Time Management:** ⏱️ Fulfill character needs before their timers expire (ADULT 20s, KID 14s, DOG 10s).
-- **Characters:** 🗣️ One-row lineup with speech bubbles showing needs (icons + text) and an animated timer bar.
+- **Characters:** 🗣️ 9 character variants across 3 types — Saba, Parent, Grandma, Soldier, Neighbor (ADULT), Teen, Toddler (KID), Dog, Cat (PET). Each spawns with a randomly selected visual variant.
 - **Interactive Stations:**
   - **Water Pitcher:** 💧 Hold to fill, release in the sweet spot (65–120%).
   - **Snack Sorter:** 🥨 Swipe left (Bisli) or right (Bamba) to sort snacks.
   - **Dog Distraction:** 🎾 Tap the ball 3 times to throw it for the dog.
   - **Charging Station:** 🔌 Drag the plug onto the moving phone to charge it.
   - **Reception Hunter:** 📶 Slide your hand to find the sweet spot and hold for 1s.
+- **Bathroom Break (mini-game):** 🚽 Every 2000 points, gameplay pauses for a 15-second vertical runner. Swipe left/right to dodge falling obstacles in a corridor. Survive = **+500 bonus points**!
+- **Harder Difficulty:** Spawn interval and character timers now scale more aggressively. At 5000 points, a 5th character slot opens.
 - **Combo Scoring:** 🔥 Fast fulfillments earn bonus points; chains multiply your score.
 - **Haptic Feedback:** 📳 Feel the urgency with tactile responses for warnings and mistakes.
 - **Local Leaderboard:** 🏆 Compete for the title of "Chief of Home Front" with saved high scores.

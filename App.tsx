@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Animated as RNAnimated,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +28,8 @@ import { LeaderboardScreen } from './src/components/LeaderboardScreen';
 import { BACKGROUND_PNGS } from './src/assets/png/backgrounds';
 import { THEME } from './src/assets/theme';
 import { useUIScale } from './src/hooks/useUIScale';
+import { useSupplyRunTrigger } from './src/hooks/useSupplyRunTrigger';
+import { SupplyRun } from './src/components/SupplyRun';
 
 const App = () => {
   const {
@@ -47,10 +50,29 @@ const App = () => {
     missedNeeds,
     runStartedAt,
     runEndedAt,
+    lives,
     fulfillNeed,
+    endSupplyRun,
   } = useGameStore();
+
+  useSupplyRunTrigger();
   const { width, height, scale } = useUIScale();
   const [nameInput, setNameInput] = useState('');
+
+  // Life-lost red flash
+  const lifeLostOpacity = useRef(new RNAnimated.Value(0)).current;
+  const prevLives = useRef(3);
+  useEffect(() => {
+    if (lives < prevLives.current && gameState === GameState.PLAYING) {
+      lifeLostOpacity.setValue(0.45);
+      RNAnimated.timing(lifeLostOpacity, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+    prevLives.current = lives;
+  }, [lives, gameState, lifeLostOpacity]);
   const scaledLayout = React.useMemo(() => {
     const characterScale = scale * 2.3;
     const stationScale = scale * 1.15;
@@ -265,6 +287,14 @@ const App = () => {
       );
     }
 
+    if (gameState === GameState.SUPPLY_RUN) {
+      return (
+        <SupplyRun
+          onComplete={(caught) => endSupplyRun(caught ? 500 : 0)}
+        />
+      );
+    }
+
     return (
       <SafeAreaView style={styles.fullScreen}>
         <CharacterManager />
@@ -272,6 +302,12 @@ const App = () => {
         <ComboPopup multiplier={Math.min(3, Math.floor(comboStreak / 2) + 1)} />
 
         <GameHUD />
+
+        {/* Red flash on life lost */}
+        <RNAnimated.View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, styles.lifeLostFlash, { opacity: lifeLostOpacity }]}
+        />
 
         {isPaused && pausedScreen === 'TUTORIAL' && (
           <View style={styles.pausedScreenOverlay}>
@@ -629,6 +665,10 @@ const styles = StyleSheet.create({
   pausedScreenOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.75)',
+  },
+  lifeLostFlash: {
+    backgroundColor: '#FF4444',
+    zIndex: 100,
   },
 });
 

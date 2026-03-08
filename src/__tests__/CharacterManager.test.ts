@@ -46,7 +46,7 @@ describe('useCharacterManager', () => {
   });
 
   it('should spawn characters faster as score increases', () => {
-    mockStoreState.score = 2000; // Interval: 4000 - 1000 = 3000ms
+    mockStoreState.score = 2000; // Interval: max(750, 4000 - 2*750) = 2500ms
     
     renderHook(() => useCharacterManager());
     

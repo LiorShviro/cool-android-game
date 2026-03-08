@@ -1,20 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { THEME } from '../assets/theme';
+import { STATION_PNGS } from '../assets/png/stations';
+import { getCharacterPng } from '../assets/png/characters';
 
 interface TutorialScreenProps {
   onBack: () => void;
 }
 
-const sections = [
-  { icon: '🚀', title: 'Goal', color: THEME.colors.orange, body: 'Keep the safe room calm! Fulfill the needs of the people and the dog before their timers run out. If you miss one, you lose a Rocket life. Lose 3 rockets, and it\'s Game Over!' },
-  { icon: '💧', title: 'Water Pitcher', color: THEME.colors.blue, body: 'Press and hold the button to pour water. Release when the cup is 65–120% full. Don\'t overfill, or the station will lock!' },
-  { icon: '🥨', title: 'Snack Sorter', color: '#FF8C00', body: 'Swipe the snack bag RIGHT for Bamba or LEFT for Bisli to give the kids what they want.' },
-  { icon: '🎾', title: 'Dog Distraction', color: THEME.colors.greenDark, body: 'The dog is barking! Tap the bouncing tennis ball 3 times quickly to throw it and quiet the dog.' },
-  { icon: '🔋', title: 'Charging Station', color: THEME.colors.yellow, body: 'Drag the cable end and drop it into the port of the moving phone to charge it.' },
-  { icon: '📶', title: 'Reception Hunter', color: '#6644BB', body: 'Swipe the hand left and right to find the sweet spot with 3 bars of signal. Hold it there for a moment to send.' },
-  { icon: '🔥', title: 'Combos', color: THEME.colors.red, body: 'Fulfill needs quickly and without mistakes to increase your multiplier and score higher!' },
+const sections: { pngSource: ImageSourcePropType; title: string; color: string; body: string }[] = [
+  { pngSource: getCharacterPng('saba', 'urgent'), title: 'Goal', color: THEME.colors.orange, body: 'Keep the safe room calm! Fulfill the needs of the people and the dog before their timers run out. If you miss one, you lose a Rocket life. Lose 3 rockets, and it\'s Game Over!' },
+  { pngSource: STATION_PNGS.waterCupBase, title: 'Water Pitcher', color: THEME.colors.blue, body: 'Press and hold the button to pour water. Release when the cup is 65–120% full. Don\'t overfill, or the station will lock!' },
+  { pngSource: STATION_PNGS.bamba, title: 'Snack Sorter', color: '#FF8C00', body: 'Swipe the snack bag RIGHT for Bamba or LEFT for Bisli to give the kids what they want.' },
+  { pngSource: STATION_PNGS.dogBall, title: 'Dog Distraction', color: THEME.colors.greenDark, body: 'The dog is barking! Tap the bouncing tennis ball 3 times quickly to throw it and quiet the dog.' },
+  { pngSource: STATION_PNGS.chargePhone, title: 'Charging Station', color: THEME.colors.yellow, body: 'Drag the cable end and drop it into the port of the moving phone to charge it.' },
+  { pngSource: STATION_PNGS.receptionHandPhone, title: 'Reception Hunter', color: '#6644BB', body: 'Swipe the hand left and right to find the sweet spot with 3 bars of signal. Hold it there for a moment to send.' },
+  { pngSource: STATION_PNGS.bisly, title: 'Combos', color: THEME.colors.red, body: 'Fulfill needs quickly and without mistakes to increase your multiplier and score higher!' },
 ];
 
 export const TutorialScreen: React.FC<TutorialScreenProps> = ({ onBack }) => {
@@ -28,9 +30,10 @@ export const TutorialScreen: React.FC<TutorialScreenProps> = ({ onBack }) => {
 
         {sections.map((s, i) => (
           <View key={i} style={[styles.section, { borderLeftColor: s.color }]}>
+            <View style={[styles.sectionTopBar, { backgroundColor: s.color }]} />
             <View style={styles.sectionHeader}>
               <View style={[styles.iconBadge, { backgroundColor: s.color }]}>
-                <Text style={styles.iconText}>{s.icon}</Text>
+                <Image source={s.pngSource} style={styles.iconImage} resizeMode="contain" />
               </View>
               <Text style={[styles.sectionTitle, { color: s.color }]}>{s.title}</Text>
             </View>
@@ -77,6 +80,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: THEME.colors.offWhite,
     padding: 14,
+    paddingTop: 0,
     borderRadius: THEME.borderRadius.medium,
     marginBottom: 12,
     elevation: 3,
@@ -87,6 +91,12 @@ const styles = StyleSheet.create({
     borderLeftWidth: 5,
     borderWidth: 2,
     borderColor: THEME.colors.outline,
+    overflow: 'hidden',
+  },
+  sectionTopBar: {
+    height: 4,
+    marginHorizontal: -14,
+    marginBottom: 12,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -95,20 +105,22 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   iconBadge: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: THEME.colors.outline,
   },
-  iconText: {
-    fontSize: 16,
+  iconImage: {
+    width: 24,
+    height: 24,
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: 'bold',
+    flex: 1,
   },
   text: {
     fontSize: 13,
