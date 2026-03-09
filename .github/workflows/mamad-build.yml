@@ -29,14 +29,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Inject version into UI
+        run: |
+          sed -i "s/Build: 1.0 (Local)/Build: 1.0.${{ github.run_number }}/g" App.tsx
+
       - name: Build Android APK
         run: |
           cd android
           # Set version and skip linting to speed up build
-          ./gradlew assembleRelease -PversionCode=${{ github.run_number }} -PversionName="4.0.${{ github.run_number }}" -x lint
+          ./gradlew assembleRelease -PversionCode=${{ github.run_number }} -PversionName="1.0.${{ github.run_number }}" -x lint
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MelechHaMamad-v4.0.${{ github.run_number }}
+          name: MamadManager-v1.0.${{ github.run_number }}
           path: android/app/build/outputs/apk/release/app-release.apk
