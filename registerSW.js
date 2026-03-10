@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/cool-android-game/sw.js', { scope: '/cool-android-game/' })})}
