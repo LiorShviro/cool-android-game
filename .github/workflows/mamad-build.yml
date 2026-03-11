@@ -57,14 +57,14 @@ jobs:
       - name: Build web app
         run: cd web && npm run build
 
-      - name: Prepare deployment folder
+      - name: Prepare game folder
         run: |
-          mkdir -p _site/play
-          cp -r docs/* _site/
-          cp -r web/dist/* _site/play/
+          mkdir -p _game
+          cp -r web/dist/* _game/
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy game to docs/play
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: _site
-          branch: gh-pages
+          folder: _game
+          target-folder: docs/play
+          branch: public
