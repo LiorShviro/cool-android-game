@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['assets/**/*'],
       manifest: {
         name: 'MelechHaMamad',
         short_name: 'Mamad',
@@ -23,6 +22,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        globIgnores: ['**/icon-192.png', '**/icon-512.png'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
     }),
