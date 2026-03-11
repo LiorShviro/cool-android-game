@@ -8,11 +8,6 @@
 
 The siren has sounded, the heavy iron door is shut, and now you have to keep everyone inside calm until the Home Front Command gives the all-clear. If the room's overall "Stress Meter" maxes out, it's Game Over!
 
-## Play in Browser
-
-Play the web version directly — no install needed, works offline as a PWA:
-**[Play MelechHaMamad](https://liorshviro.github.io/cool-android-game/play/)**
-
 ## Download (v4.0)
 
 Download the latest APK from [GitHub Releases](https://github.com/LiorShviro/cool-android-game/releases/latest).
