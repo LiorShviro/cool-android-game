@@ -2,7 +2,7 @@ name: Mamad Standalone Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, public ]
   workflow_dispatch:
 
 jobs:
