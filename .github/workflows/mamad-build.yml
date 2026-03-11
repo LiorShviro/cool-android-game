@@ -51,20 +51,20 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
+      - name: Install web dependencies
+        run: cd web && npm install
 
-      - name: Build Web
-        run: npx expo export:web
+      - name: Build web app
+        run: cd web && npm run build
 
-      - name: Move to subfolder
+      - name: Prepare deployment folder
         run: |
-          mkdir play
-          mv dist/* play/
+          mkdir -p _site/play
+          cp -r docs/* _site/
+          cp -r web/dist/* _site/play/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: play
-          target-folder: play
+          folder: _site
           branch: gh-pages

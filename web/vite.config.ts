@@ -27,5 +27,5 @@ export default defineConfig({
       },
     }),
   ],
-  base: '/cool-android-game/',
+  base: '/cool-android-game/play/',
 });

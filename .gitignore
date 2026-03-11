@@ -76,3 +76,9 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Web build output
+web/dist/
+
+# Internal dev docs
+docs/web-port-plan.md
