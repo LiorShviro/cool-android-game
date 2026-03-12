@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Melech HaMamad — Safe Room Chaos</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
-<meta name="description" content="Manage your family's shelter chaos during an air raid alarm. A fast-paced casual Android game.">
+<meta name="description" content="Manage your family's shelter chaos during an air raid alarm. A fast-paced casual game — play on Android or right in your browser.">
 <meta property="og:title" content="Melech HaMamad — Safe Room Chaos">
-<meta property="og:description" content="Manage your family's shelter chaos during an air raid alarm. A fast-paced casual Android game.">
+<meta property="og:description" content="Manage your family's shelter chaos during an air raid alarm. A fast-paced casual game — play on Android or right in your browser.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://liorshviro.github.io/cool-android-game/">
 <meta property="og:image" content="https://liorshviro.github.io/cool-android-game/assets/og-image.png">
@@ -793,6 +793,56 @@
     .parade-char img { height: 90px; }
     .hero-parade { gap: 6px; }
   }
+
+  /* ── Play in Browser button ── */
+  .hero-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-play {
+    background: #4a7c59 !important;
+  }
+  .btn-play:hover {
+    background: #5a9469 !important;
+  }
+  .btn-download-wrap:has(.btn-play)::before {
+    border-color: #4a7c59;
+  }
+
+  /* ── Info cards (How to Install + How to Play) ── */
+  .info-cards {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .info-cards .install-steps {
+    flex: 1;
+    margin-top: 0;
+    max-width: none;
+  }
+  @media (max-width: 560px) {
+    .info-cards {
+      flex-direction: column;
+    }
+  }
+
+  /* ── Counter badges row ── */
+  .counter-badges {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .counter-badges .version-badge {
+    margin-top: 0;
+  }
 </style>
 </head>
 <body>
@@ -837,26 +887,46 @@
     </div>
 
     <div class="hero-download-wrap">
-      <div class="btn-download-wrap">
-        <a class="btn-download" href="https://github.com/LiorShviro/cool-android-game/releases/latest/download/MelechHaMamad.apk" download>
-          ⬇ Download APK
-        </a>
+      <div class="hero-buttons">
+        <div class="btn-download-wrap">
+          <a class="btn-download" href="https://github.com/LiorShviro/cool-android-game/releases/latest/download/MelechHaMamad.apk" download>
+            ⬇ Download APK
+          </a>
+        </div>
+        <div class="btn-download-wrap">
+          <a class="btn-download btn-play" href="/cool-android-game/play/">
+            ▶ Play in Browser
+          </a>
+        </div>
       </div>
       <a class="btn-github" href="https://github.com/LiorShviro/cool-android-game" target="_blank" rel="noopener">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.744.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
         View on GitHub
       </a>
-      <div class="install-steps">
-        <div class="install-steps-title">How to install</div>
-        <ol>
-          <li>Tap <strong>Download APK</strong> above</li>
-          <li>Open the downloaded file on your Android device</li>
-          <li>If prompted, go to <strong>Settings → Install Unknown Apps</strong> and allow your browser</li>
-          <li>Tap <strong>Install</strong> and enjoy</li>
-        </ol>
+      <div class="info-cards">
+        <div class="install-steps">
+          <div class="install-steps-title">How to install</div>
+          <ol>
+            <li>Tap <strong>Download APK</strong> above</li>
+            <li>Open the file on your Android device</li>
+            <li>Allow <strong>Unknown Apps</strong> if prompted</li>
+            <li>Tap <strong>Install</strong> and enjoy</li>
+          </ol>
+        </div>
+        <div class="install-steps">
+          <div class="install-steps-title">How to play in browser</div>
+          <ol>
+            <li>Tap <strong>Play in Browser</strong> — works on any device</li>
+            <li>Tap stations to fulfill needs before timers run out</li>
+            <li>Keep the tab open — once loaded, <strong>no reception needed</strong></li>
+          </ol>
+        </div>
       </div>
-      <div class="version-badge">v4.0 · Free · Android only</div>
-      <div class="version-badge" id="download-count"></div>
+      <div class="version-badge">v4.0 · Free · Android + Web</div>
+      <div class="counter-badges">
+        <div class="version-badge" id="download-count"></div>
+        <div class="version-badge" id="play-count"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1130,16 +1200,16 @@
       </a>
     </div>
     <p class="cta-note reveal reveal-d3">
-      Requires Android · Enable Unknown Sources in Settings · Free to play
+      APK for Android · Browser version works on any device · Free to play
     </p>
   </div>
 </section>
 
 <!-- ── FOOTER ── -->
 <footer>
-  Built with React Native
+  Built with React Native + Vite
   <span>·</span>
-  Direct APK download · Free · Android
+  Android APK + Browser · Free
   <span>·</span>
   © 2026 Lior Shviro
   <span>·</span>
@@ -1181,6 +1251,21 @@
       }
     })
     .catch(() => {});
+
+  // Browser play counter via GoatCounter
+  // Set this to your site code from goatcounter.com (e.g. 'mamad-game')
+  const GOATCOUNTER_SITE = 'melechhamamad';
+  if (GOATCOUNTER_SITE) {
+    fetch(`https://${GOATCOUNTER_SITE}.goatcounter.com/counter/%2Fcool-android-game%2Fplay%2F.json`)
+      .then(r => r.json())
+      .then(data => {
+        const count = parseInt((data.count || '0').replace(/,/g, ''));
+        if (count > 0) {
+          document.getElementById('play-count').textContent = count + ' browser plays';
+        }
+      })
+      .catch(() => {});
+  }
 </script>
 </body>
 </html>
